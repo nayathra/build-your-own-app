@@ -10,7 +10,7 @@ The goal is not to hide development behind one "generate" button. The prototype 
 
 1. **Understand** — Gemini converts the user's idea into an app definition with users, problem, goal and MVP features.
 2. **Plan** — Gemini creates an app-specific technical blueprint covering platform, frontend, backend, data, screens, architecture and API/data contracts.
-3. **Build** — the approved blueprint drives a simulated prototype-generation pipeline and preview.
+3. **Build** — the approved blueprint drives a prototype-generation pipeline, preview, and a downloadable starter project for Web, Mobile, or Both.
 4. **Explain** — the same generated plan is translated into beginner-friendly architecture, components and technical decisions.
 5. **Learn** — Gemini-generated learning steps and exercises show how to modify and extend the specific app.
 
@@ -84,7 +84,11 @@ AI output is used for:
 - architecture explanation
 - app-specific learning guidance
 
-The current **Build** stage is intentionally a prototype-generation simulation. It does not claim to generate and execute a complete production codebase from the model response.
+The current **Build** stage generates a topic-aware prototype preview and a runnable starter project. Web exports use React + Vite; Mobile exports use Expo + React Native; Both exports include both starters. It does not claim to generate a complete production codebase from the model response.
+
+## Exported projects
+
+After Build, use **Download Project** to export a ZIP for the selected platform. Unzip it, open it in VS Code, install dependencies, and run the commands in the included README.
 
 ## Security
 
