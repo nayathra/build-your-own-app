@@ -29,6 +29,7 @@ import {
   GraduationCap as GraduationCapIcon,
 } from 'lucide-react'
 import './App.css'
+import { downloadProjectZip } from './exportProject'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -97,6 +98,7 @@ function App() {
   const [prototypeReady, setPrototypeReady] = useState(false)
   const [previewOpen, setPreviewOpen] = useState(false)
   const [selectedTheme, setSelectedTheme] = useState<ThemeId>('ocean')
+  const [isExporting, setIsExporting] = useState(false)
 
   const generateUnderstanding = async () => {
     if (!prompt.trim() || isGeneratingAI) return
@@ -145,6 +147,20 @@ function App() {
     }, 3000)
   }
 
+  const exportProject = async () => {
+    if (!understanding || isExporting) return
+    setIsExporting(true)
+    try {
+      await downloadProjectZip(
+        understanding.appName,
+        understanding.summary,
+        understanding.features,
+        understanding.platform as 'Web' | 'Mobile' | 'Both',
+      )
+    } finally {
+      setIsExporting(false)
+    }
+  }
   const resetProject = () => {
     setPrompt('')
     setStarted(false)
@@ -473,10 +489,17 @@ function App() {
                         <div className="ready-icon"><Check size={25} /></div>
                         <span className="section-label">PROTOTYPE READY</span>
                         <h2>{understanding.appName} is ready.</h2>
-                        <p>Your prototype experience has been prepared from the approved AI blueprint.</p>
+                        <p>Preview the generated experience now, or export a runnable starter project for the platform you selected.</p>
                         <div className="ready-actions">
                           <button className="generate-button" onClick={() => setPreviewOpen(true)}>Open Preview <ArrowRight size={17} /></button>
+                          <button className="generate-button export-button" onClick={exportProject} disabled={isExporting}>
+                            {isExporting ? 'Preparing ZIP...' : 'Download Project'}
+                          </button>
                           <button className="change-button" onClick={() => setPrototypeReady(false)}>Regenerate</button>
+                        </div>
+                        <div className="export-note">
+                          <strong>{understanding.platform === 'Mobile' ? 'Expo mobile project' : understanding.platform === 'Both' ? 'Web + Expo mobile projects' : 'React + Vite web project'}</strong>
+                          <span>Unzip it, open the folder in VS Code, install dependencies and run the included README commands.</span>
                         </div>
                       </div>
                     )}
