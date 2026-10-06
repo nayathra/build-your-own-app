@@ -30,6 +30,8 @@ import {
 } from 'lucide-react'
 import './App.css'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+
 const stages = [
   { id: 'understand', label: 'Understand', icon: Brain },
   { id: 'plan', label: 'Plan', icon: ClipboardList },
@@ -101,7 +103,7 @@ function App() {
     setIsGeneratingAI(true)
 
     try {
-      const response = await fetch('http://localhost:8000/api/analyze', {
+      const response = await fetch(`${API_URL}/api/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: prompt.trim() }),
