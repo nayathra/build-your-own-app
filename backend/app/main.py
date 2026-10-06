@@ -1,3 +1,4 @@
+import logging
 import os
 import time
 
@@ -9,6 +10,8 @@ from google import genai
 from google.genai import types
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 API_KEY = os.getenv("GEMINI_API_KEY")
 if not API_KEY:
@@ -171,7 +174,8 @@ User app idea:
                     continue
                 break
 
+    logger.exception("Gemini analysis failed after all configured model retries. Last error: %s", last_error)
     raise HTTPException(
         status_code=502,
-        detail=f"Gemini analysis is temporarily unavailable. Please try again in a moment. Last error: {last_error}",
+        detail="AI analysis is temporarily unavailable.",
     )
