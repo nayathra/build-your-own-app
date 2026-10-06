@@ -887,25 +887,62 @@ function PrototypeWebsite({ appName, summary, features, selectedTheme, onClose }
           </div>
         </section>
 
-        <section className="preview-cards">
-          {features.map((feature, index) => {
-            const FeatureIcon = featureIcons[index % featureIcons.length]
-            return (
-              <article className="preview-card" key={feature}>
-                <div className="preview-card-visual">
-                  <div className="preview-card-visual-glow" />
-                  <FeatureIcon size={27} />
-                  <span>0{String(index + 1)}</span>
-                </div>
-                <div className="preview-card-meta">{profile.category.toUpperCase()} · {String(index + 1).padStart(2, '0')}</div>
-                <h3>{feature}</h3>
-                <p>Designed as a real part of the {appName} experience.</p>
-                <button>Open feature <ArrowRight size={13} /></button>
-              </article>
-            )
-          })}
+        <section className="preview-real-content">
+          <div className="real-content-heading">
+            <div>
+              <span>{profile.sectionLabel}</span>
+              <h3>{profile.sectionTitle}</h3>
+            </div>
+            <button className="preview-secondary">View all <ArrowRight size={14} /></button>
+          </div>
+
+          <div className="real-content-layout">
+            <article className="real-feature">
+              <div className="real-feature-art">
+                <div className="real-art-orb orb-a" />
+                <div className="real-art-orb orb-b" />
+                <VisualIcon size={58} />
+                <span>{profile.heroTag}</span>
+              </div>
+              <div className="real-feature-copy">
+                <span>01 · FEATURED</span>
+                <h4>{features[0] || profile.visualTitle}</h4>
+                <p>{profile.heroSubline}</p>
+                <button>{profile.primaryCta} <ArrowRight size={14} /></button>
+              </div>
+            </article>
+
+            <div className="real-feature-list">
+              {features.slice(1).map((feature, index) => {
+                const FeatureIcon = featureIcons[(index + 1) % featureIcons.length]
+                return (
+                  <article className="real-list-item" key={feature}>
+                    <div className="real-list-icon"><FeatureIcon size={19} /></div>
+                    <div className="real-list-copy">
+                      <span>0{index + 2} · {profile.category.toUpperCase()}</span>
+                      <h4>{feature}</h4>
+                      <p>Designed as part of the {appName} experience.</p>
+                    </div>
+                    <ArrowRight size={15} className="real-list-arrow" />
+                  </article>
+                )
+              })}
+            </div>
+          </div>
         </section>
 
+        <section className="preview-experience-strip">
+          <div className="experience-copy">
+            <span>{profile.kicker}</span>
+            <h3>A complete experience built around your idea.</h3>
+            <p>{summary}</p>
+          </div>
+          <div className="experience-actions">
+            <div className="experience-chip"><Check size={13} /> Personalized</div>
+            <div className="experience-chip"><Check size={13} /> Responsive</div>
+            <div className="experience-chip"><Check size={13} /> Ready to extend</div>
+          </div>
+        </section>
         <section className="preview-cta">
           <div>
             <span>{profile.kicker}</span>
