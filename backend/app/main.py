@@ -117,9 +117,13 @@ Rules:
 User app idea:
 {prompt}"""
 
-    # Keep the demo responsive: use the primary Flash model and only one retry
-    # for transient capacity/rate-limit errors.
-    models = ["gemini-3.8-flash"]
+    # Try a small fallback chain so a temporary capacity spike does not block
+    # the demo. The first available Flash model wins.
+    models = [
+        "gemini-3.8-flash",
+        "gemini-2.5-flash",
+        "gemini-2.5-flash-lite",
+    ]
 
     last_error = None
 
