@@ -117,17 +117,14 @@ Rules:
 User app idea:
 {prompt}"""
 
-    models = [
-        "gemini-3.8-flash",
-        "gemini-3.7-flash",
-        "gemini-3.6-flash",
-        "gemini-3.5-flash",
-    ]
+    # Keep the demo responsive: use the primary Flash model and only one retry
+    # for transient capacity/rate-limit errors.
+    models = ["gemini-3.8-flash"]
 
     last_error = None
 
     for model_name in models:
-        for attempt in range(3):
+        for attempt in range(2):
             try:
                 response = client.models.generate_content(
                     model=model_name,
@@ -163,12 +160,12 @@ User app idea:
                         "resource exhausted",
                     ]
                 )
-                if transient and attempt < 2:
-                    time.sleep(1.5 * (2 ** attempt))
+                if transient and attempt < 1:
+                    time.sleep(0.7)
                     continue
                 break
 
     raise HTTPException(
         status_code=502,
-        detail=f"Gemini analysis is temporarily unavailable. Tried multiple Gemini Flash models. Last error: {last_error}",
+        detail=f"Gemini analysis is temporarily unavailable. Please try again in a moment. Last error: {last_error}",
     )
