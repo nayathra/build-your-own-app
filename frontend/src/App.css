@@ -2693,3 +2693,24 @@ body::after {
     transition-duration: .01ms !important;
   }
 }
+
+
+/* Fix prompt editor contrast in the light premium theme */
+.prompt-card textarea,
+.prompt-card textarea:focus {
+  color: #17151a !important;
+  -webkit-text-fill-color: #17151a;
+  caret-color: #ff5f85;
+  background: #ffffff !important;
+  border-color: #e5dfe3;
+}
+
+.prompt-card textarea::placeholder {
+  color: #a39aa5 !important;
+  opacity: 1;
+}
+
+.prompt-card textarea:focus {
+  border-color: rgba(255,95,133,.48);
+  box-shadow: 0 0 0 4px rgba(255,95,133,.07), 0 15px 40px rgba(30,20,30,.06);
+}
