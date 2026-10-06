@@ -62,8 +62,8 @@ class ExplainData(BaseModel):
 
 
 class LearningItem(BaseModel):
-    title: str
-    description: str
+    name: str
+    purpose: str
 
 
 class AppLearning(BaseModel):
@@ -81,6 +81,42 @@ class AppUnderstanding(BaseModel):
     plan: AppPlan
     explain: ExplainData
     learn: AppLearning
+
+
+def normalize_actual_stack(result: AppUnderstanding) -> AppUnderstanding:
+    """Keep Explain/Plan aligned with the technology actually shipped by this prototype."""
+    actual_data = "No persistent database in the current prototype; structured AI output and client state drive the demo."
+
+    result.plan.frontend = "React + TypeScript + Vite"
+    result.plan.backend = "FastAPI + Python"
+    result.plan.data = actual_data
+    result.plan.architecture = [
+        PlanItem(name="React + TypeScript + Vite builder", purpose="Renders the five-stage workspace and generated prototype preview in the browser."),
+        PlanItem(name="FastAPI + Pydantic API", purpose="Accepts the app idea at /api/analyze and validates the structured AI response."),
+        PlanItem(name="Gemini structured generation", purpose="Converts the natural-language idea into one structured Understand, Plan, Explain and Learn blueprint."),
+        PlanItem(name="Client-side prototype renderer", purpose="Uses the approved blueprint to render a topic-aware website prototype without claiming to generate a production codebase."),
+    ]
+    result.plan.apiEndpoints = [
+        PlanItem(name="POST /api/analyze", purpose="Converts an app idea into the structured product blueprint used by all five stages."),
+        PlanItem(name="GET /health", purpose="Checks that the FastAPI service is healthy."),
+    ]
+
+    result.explain.frontend = "React + TypeScript + Vite renders the builder workspace, stage navigation and topic-aware prototype preview."
+    result.explain.backend = "FastAPI + Python exposes /api/analyze, validates the structured response with Pydantic and calls the Gemini API."
+    result.explain.data = actual_data
+    result.explain.technicalDecisions = [
+        PlanItem(name="Structured Gemini output", purpose="A Pydantic schema keeps one AI response consistent across Understand, Plan, Explain and Learn."),
+        PlanItem(name="FastAPI boundary", purpose="The Gemini API key stays on the backend instead of being exposed in the browser."),
+        PlanItem(name="Prototype simulation", purpose="Build renders a working website-like preview from the approved blueprint instead of pretending to generate and execute a full production codebase."),
+        PlanItem(name="No persistent database", purpose="The assignment prototype does not require user accounts or stored application data, so the current demo keeps state in the client."),
+    ]
+    result.explain.components = [
+        PlanItem(name="Builder workspace", purpose="Collects the app idea and guides the user through the five stages."),
+        PlanItem(name="AI analysis endpoint", purpose="Produces the structured product blueprint from the natural-language prompt."),
+        PlanItem(name="PrototypeWebsite", purpose="Renders topic-aware website content and the selected visual theme."),
+        PlanItem(name="Explain and Learn views", purpose="Connects the generated blueprint to technical decisions and hands-on exercises."),
+    ]
+    return result
 
 
 @app.get("/")
@@ -112,6 +148,9 @@ Rules:
 - Make the app name concise and memorable.
 - Keep the plan practical for a student prototype.
 - Choose a sensible frontend, backend and data approach for the selected idea.
+- The shipped prototype stack is fixed: React + TypeScript + Vite frontend, FastAPI + Python backend, Google Gemini API, and no persistent database.
+- Never describe this shipped prototype as using Express, Node.js, PostgreSQL, MongoDB, Firebase, Next.js, or another stack unless the user explicitly asked for a separate future architecture.
+- In Explain, describe the actual shipped prototype stack, not a hypothetical production stack.
 - Screens should be concrete UI screens.
 - Architecture should describe the main application layers/components.
 - API endpoints should be useful planned endpoints, not imaginary existing endpoints.
@@ -153,12 +192,12 @@ User app idea:
                 if getattr(response, "parsed", None) is not None:
                     result = response.parsed
                     if isinstance(result, AppUnderstanding):
-                        return result
+                        return normalize_actual_stack(result)
 
                 if not response.text:
                     raise ValueError("Gemini returned an empty response.")
 
-                return AppUnderstanding.model_validate_json(response.text)
+                return normalize_actual_stack(AppUnderstanding.model_validate_json(response.text))
 
             except Exception as exc:
                 last_error = exc
