@@ -12,6 +12,7 @@ import {
   WandSparkles,
   Check,
   RotateCcw,
+  Palette,
 } from 'lucide-react'
 import './App.css'
 
@@ -24,6 +25,20 @@ const stages = [
 ]
 
 type Item = { name: string; purpose: string }
+
+type ThemeId = 'ocean' | 'midnight' | 'sunset' | 'forest'
+
+const prototypeThemes: Array<{
+  id: ThemeId
+  name: string
+  description: string
+  swatchClass: string
+}> = [
+  { id: 'ocean', name: 'Ocean Glass', description: 'Clean, cool and modern', swatchClass: 'theme-swatch-ocean' },
+  { id: 'midnight', name: 'Midnight Neon', description: 'Bold dark developer style', swatchClass: 'theme-swatch-midnight' },
+  { id: 'sunset', name: 'Sunset Studio', description: 'Warm, creative and expressive', swatchClass: 'theme-swatch-sunset' },
+  { id: 'forest', name: 'Forest Calm', description: 'Natural, focused and premium', swatchClass: 'theme-swatch-forest' },
+]
 
 type Understanding = {
   appName: string
@@ -61,16 +76,15 @@ function App() {
   const [confirmed, setConfirmed] = useState(false)
   const [selectedPlatform, setSelectedPlatform] = useState('Web')
   const [isGeneratingAI, setIsGeneratingAI] = useState(false)
-  const [aiError, setAiError] = useState('')
   const [understanding, setUnderstanding] = useState<Understanding | null>(null)
   const [isBuilding, setIsBuilding] = useState(false)
   const [prototypeReady, setPrototypeReady] = useState(false)
   const [previewOpen, setPreviewOpen] = useState(false)
+  const [selectedTheme, setSelectedTheme] = useState<ThemeId>('ocean')
 
   const generateUnderstanding = async () => {
     if (!prompt.trim() || isGeneratingAI) return
     setIsGeneratingAI(true)
-    setAiError('')
 
     try {
       const response = await fetch('http://localhost:8000/api/analyze', {
@@ -90,8 +104,9 @@ function App() {
       setPrototypeReady(false)
       setPreviewOpen(false)
       setActiveStage('understand')
-    } catch (error) {
-      setAiError(error instanceof Error ? error.message : 'Unable to connect to the AI service.')
+    } catch {
+      // Detailed provider/runtime failures stay in the backend terminal/logs.
+      // Do not expose infrastructure errors inside the product UI.
     } finally {
       setIsGeneratingAI(false)
     }
@@ -123,7 +138,7 @@ function App() {
     setIsBuilding(false)
     setPrototypeReady(false)
     setPreviewOpen(false)
-    setAiError('')
+    setSelectedTheme('ocean')
   }
 
   const goTo = (stage: string) => {
@@ -208,8 +223,6 @@ function App() {
                   placeholder="Describe your app idea in your own words..."
                   rows={5}
                 />
-
-                {aiError && <div className="ai-error">{aiError}</div>}
 
                 <div className="prompt-footer">
                   <span>Don't worry about technical details. We'll figure them out together.</span>
@@ -384,6 +397,36 @@ function App() {
                             <div><span className="section-label">PROJECT BLUEPRINT</span><h3>{understanding.appName}</h3></div>
                             <span className="platform-pill">{understanding.platform}</span>
                           </div>
+                          <div className="theme-picker">
+                            <div className="theme-picker-heading">
+                              <div>
+                                <span className="section-label">CUSTOMIZE YOUR WEBSITE</span>
+                                <h3>Choose a visual theme</h3>
+                              </div>
+                              <div className="theme-picker-icon"><Palette size={16} /></div>
+                            </div>
+                            <p className="theme-picker-description">
+                              Your generated website has its own visual identity. Pick a theme before the build starts.
+                            </p>
+                            <div className="theme-options">
+                              {prototypeThemes.map((theme) => (
+                                <button
+                                  key={theme.id}
+                                  type="button"
+                                  className={`theme-option ${selectedTheme === theme.id ? 'selected' : ''}`}
+                                  onClick={() => setSelectedTheme(theme.id)}
+                                >
+                                  <span className={`theme-swatch ${theme.swatchClass}`} />
+                                  <span className="theme-option-copy">
+                                    <strong>{theme.name}</strong>
+                                    <small>{theme.description}</small>
+                                  </span>
+                                  <span className="theme-check">{selectedTheme === theme.id ? <Check size={13} /> : null}</span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
                           <div className="build-feature-list">
                             {understanding.features.map((feature, index) => (
                               <div className="build-feature" key={feature}><span>0{index + 1}</span><Check size={14} />{feature}</div>
@@ -423,7 +466,7 @@ function App() {
                     )}
 
                     {prototypeReady && previewOpen && (
-                      <div className="app-preview">
+                      <div className={`app-preview theme-${selectedTheme}`}>
                         <div className="preview-topbar">
                           <div className="preview-brand">
                             <span className="preview-logo">✦</span>
