@@ -13,6 +13,20 @@ import {
   Check,
   RotateCcw,
   Palette,
+  Dumbbell,
+  BookOpen,
+  Utensils,
+  Plane,
+  WalletCards,
+  HeartPulse,
+  BriefcaseBusiness,
+  ShoppingBag,
+  MapPin,
+  CalendarDays,
+  Star,
+  Camera,
+  Music,
+  GraduationCap as GraduationCapIcon,
 } from 'lucide-react'
 import './App.css'
 
@@ -466,73 +480,14 @@ function App() {
                     )}
 
                     {prototypeReady && previewOpen && (
-                      <div className={`app-preview theme-${selectedTheme}`}>
-                        <div className="preview-topbar">
-                          <div className="preview-brand">
-                            <span className="preview-logo">✦</span>
-                            <strong>{understanding.appName}</strong>
-                          </div>
-                          <nav className="preview-nav">
-                            <span>Discover</span>
-                            <span>How it works</span>
-                            <span>My listings</span>
-                          </nav>
-                          <button className="preview-close" onClick={() => setPreviewOpen(false)}>Close preview</button>
-                        </div>
-
-                        <div className="preview-site">
-                          <section className="preview-hero">
-                            <div className="preview-hero-copy">
-                              <span className="preview-kicker">CAMPUS MARKETPLACE</span>
-                              <h2>{understanding.appName}</h2>
-                              <p>{understanding.summary}</p>
-                              <div className="preview-actions">
-                                <button className="preview-primary">Explore listings <ArrowRight size={15} /></button>
-                                <button className="preview-secondary">Create a listing</button>
-                              </div>
-                            </div>
-                            <div className="preview-hero-art">
-                              <div className="hero-art-card"><span>BOOKS</span><strong>Find it. Trade it. Learn.</strong><small>Built for your campus community.</small></div>
-                              <div className="hero-orbit one" />
-                              <div className="hero-orbit two" />
-                            </div>
-                          </section>
-
-                          <section className="preview-toolbar">
-                            <div>
-                              <span>EXPLORE THE MARKETPLACE</span>
-                              <strong>Find what you need for your next class.</strong>
-                            </div>
-                            <div className="preview-search">⌕ Search books, courses, authors...</div>
-                          </section>
-
-                          <section className="preview-cards">
-                            {understanding.features.map((feature, index) => (
-                              <article className="preview-card" key={feature}>
-                                <div className="preview-card-icon">{String(index + 1).padStart(2, '0')}</div>
-                                <div className="preview-card-meta">FEATURE {String(index + 1).padStart(2, '0')}</div>
-                                <h3>{feature}</h3>
-                                <p>Explore this part of the {understanding.appName} experience.</p>
-                                <button>View feature <ArrowRight size={13} /></button>
-                              </article>
-                            ))}
-                          </section>
-
-                          <section className="preview-cta">
-                            <div>
-                              <span>BUILT FOR REAL CAMPUS NEEDS</span>
-                              <h3>Everything you need to get started.</h3>
-                            </div>
-                            <button className="preview-primary">Get started <ArrowRight size={15} /></button>
-                          </section>
-
-                          <footer className="preview-footer">
-                            <span>✦ {understanding.appName}</span>
-                            <span>Generated prototype · AI-assisted development</span>
-                          </footer>
-                        </div>
-                      </div>
-                    )}
+                      <PrototypeWebsite
+                        appName={understanding.appName}
+                        summary={understanding.summary}
+                        features={understanding.features}
+                        selectedTheme={selectedTheme}
+                        onClose={() => setPreviewOpen(false)}
+                      />
+                    )}}
 
                     {prototypeReady && (
                       <div className="continue-row">
@@ -624,6 +579,346 @@ function App() {
           )}
         </section>
       </main>
+    </div>
+  )
+}
+
+
+type PrototypeWebsiteProps = {
+  appName: string
+  summary: string
+  features: string[]
+  selectedTheme: ThemeId
+  onClose: () => void
+}
+
+type PrototypeProfile = {
+  category: 'fitness' | 'books' | 'food' | 'travel' | 'finance' | 'education' | 'shopping' | 'music' | 'generic'
+  kicker: string
+  nav: string[]
+  primaryCta: string
+  secondaryCta: string
+  sectionLabel: string
+  sectionTitle: string
+  searchPlaceholder: string
+  heroTag: string
+  heroHeadline: string
+  heroSubline: string
+  visualIcon: typeof Dumbbell
+  visualLabel: string
+  visualTitle: string
+  visualMeta: string
+  metricLabels: string[]
+}
+
+function getPrototypeProfile(appName: string, summary: string, features: string[]): PrototypeProfile {
+  const text = `${appName} ${summary} ${features.join(' ')}`.toLowerCase()
+
+  if (/fitness|workout|gym|exercise|health|running|training|calorie/.test(text)) {
+    return {
+      category: 'fitness',
+      kicker: 'FITNESS & WELLNESS',
+      nav: ['Dashboard', 'Workouts', 'Progress'],
+      primaryCta: 'Start workout',
+      secondaryCta: 'View progress',
+      sectionLabel: 'YOUR TRAINING SPACE',
+      sectionTitle: 'Build momentum, one session at a time.',
+      searchPlaceholder: 'Search workouts, exercises...',
+      heroTag: 'TODAY\'S FOCUS',
+      heroHeadline: 'Train smarter.',
+      heroSubline: 'Track sessions, build routines and turn daily movement into measurable progress.',
+      visualIcon: Dumbbell,
+      visualLabel: 'TODAY',
+      visualTitle: 'Full Body Strength',
+      visualMeta: '42 min · 6 exercises',
+      metricLabels: ['Weekly goal', 'Workouts', 'Calories'],
+    }
+  }
+
+  if (/book|textbook|library|read|novel|course material|literature/.test(text)) {
+    return {
+      category: 'books',
+      kicker: 'BOOKS & LEARNING',
+      nav: ['Discover', 'Collections', 'My shelf'],
+      primaryCta: 'Explore books',
+      secondaryCta: 'My reading list',
+      sectionLabel: 'DISCOVER SOMETHING NEW',
+      sectionTitle: 'Find your next great read.',
+      searchPlaceholder: 'Search books, authors, subjects...',
+      heroTag: 'FEATURED COLLECTION',
+      heroHeadline: 'Read more. Learn more.',
+      heroSubline: 'Discover useful titles, organize your shelf and find the right book for what you are learning.',
+      visualIcon: BookOpen,
+      visualLabel: 'FEATURED',
+      visualTitle: 'The Knowledge Shelf',
+      visualMeta: '24 titles · Curated for you',
+      metricLabels: ['Books saved', 'In progress', 'Completed'],
+    }
+  }
+
+  if (/food|recipe|restaurant|meal|cook|nutrition|diet/.test(text)) {
+    return {
+      category: 'food',
+      kicker: 'FOOD & RECIPES',
+      nav: ['Discover', 'Recipes', 'Favorites'],
+      primaryCta: 'Find a recipe',
+      secondaryCta: 'Plan a meal',
+      sectionLabel: 'WHAT ARE YOU CRAVING?',
+      sectionTitle: 'Good food starts with a good idea.',
+      searchPlaceholder: 'Search recipes, ingredients...',
+      heroTag: 'TODAY\'S PICK',
+      heroHeadline: 'Cook something memorable.',
+      heroSubline: 'Discover recipes, save favorites and turn everyday ingredients into meals you will love.',
+      visualIcon: Utensils,
+      visualLabel: 'POPULAR',
+      visualTitle: 'Fresh & Simple',
+      visualMeta: '30 min · Easy',
+      metricLabels: ['Saved recipes', 'Meals planned', 'Favorites'],
+    }
+  }
+
+  if (/travel|trip|tour|flight|hotel|destination|vacation/.test(text)) {
+    return {
+      category: 'travel',
+      kicker: 'TRAVEL & DISCOVERY',
+      nav: ['Explore', 'Trips', 'Saved places'],
+      primaryCta: 'Explore places',
+      secondaryCta: 'Plan a trip',
+      sectionLabel: 'EXPLORE THE WORLD',
+      sectionTitle: 'Your next adventure starts here.',
+      searchPlaceholder: 'Search places, cities, experiences...',
+      heroTag: 'WEEKEND ESCAPE',
+      heroHeadline: 'Go somewhere new.',
+      heroSubline: 'Discover places, save ideas and turn inspiration into a trip that is easy to plan.',
+      visualIcon: Plane,
+      visualLabel: 'NEXT TRIP',
+      visualTitle: 'Coastal Escape',
+      visualMeta: '3 days · 12 saved places',
+      metricLabels: ['Places saved', 'Trips planned', 'Memories'],
+    }
+  }
+
+  if (/finance|money|budget|expense|bank|investment|saving|payment/.test(text)) {
+    return {
+      category: 'finance',
+      kicker: 'MONEY & FINANCE',
+      nav: ['Overview', 'Transactions', 'Goals'],
+      primaryCta: 'Add transaction',
+      secondaryCta: 'View insights',
+      sectionLabel: 'FINANCIAL OVERVIEW',
+      sectionTitle: 'Make every decision with clarity.',
+      searchPlaceholder: 'Search transactions...',
+      heroTag: 'THIS MONTH',
+      heroHeadline: 'Your money, at a glance.',
+      heroSubline: 'Track spending, understand patterns and stay focused on the financial goals that matter.',
+      visualIcon: WalletCards,
+      visualLabel: 'BALANCE',
+      visualTitle: 'Monthly Overview',
+      visualMeta: 'On track · 4 goals active',
+      metricLabels: ['Balance', 'Saved', 'Spent'],
+    }
+  }
+
+  if (/student|education|course|learning|study|college|school|class|academic/.test(text)) {
+    return {
+      category: 'education',
+      kicker: 'LEARNING PLATFORM',
+      nav: ['Dashboard', 'Courses', 'Progress'],
+      primaryCta: 'Continue learning',
+      secondaryCta: 'Explore courses',
+      sectionLabel: 'YOUR LEARNING SPACE',
+      sectionTitle: 'Turn small study sessions into progress.',
+      searchPlaceholder: 'Search courses, topics...',
+      heroTag: 'CONTINUE LEARNING',
+      heroHeadline: 'Keep moving forward.',
+      heroSubline: 'Organize learning, track progress and make every study session count.',
+      visualIcon: GraduationCapIcon,
+      visualLabel: 'IN PROGRESS',
+      visualTitle: 'Current Course',
+      visualMeta: '68% complete · 4 lessons left',
+      metricLabels: ['Courses', 'Study hours', 'Progress'],
+    }
+  }
+
+  if (/shop|store|product|marketplace|sell|buy|commerce/.test(text)) {
+    return {
+      category: 'shopping',
+      kicker: 'SHOPPING EXPERIENCE',
+      nav: ['Discover', 'Collections', 'Cart'],
+      primaryCta: 'Start shopping',
+      secondaryCta: 'View collection',
+      sectionLabel: 'CURATED FOR YOU',
+      sectionTitle: 'Discover things worth adding to your world.',
+      searchPlaceholder: 'Search products, collections...',
+      heroTag: 'FEATURED DROP',
+      heroHeadline: 'Find your next favorite.',
+      heroSubline: 'Browse products, save what you love and make shopping feel simple and personal.',
+      visualIcon: ShoppingBag,
+      visualLabel: 'FEATURED',
+      visualTitle: 'Editor\'s Picks',
+      visualMeta: '12 items · Updated today',
+      metricLabels: ['Saved items', 'Orders', 'Collections'],
+    }
+  }
+
+  if (/music|song|playlist|audio|podcast/.test(text)) {
+    return {
+      category: 'music',
+      kicker: 'MUSIC & AUDIO',
+      nav: ['Home', 'Library', 'Playlists'],
+      primaryCta: 'Start listening',
+      secondaryCta: 'Browse library',
+      sectionLabel: 'MADE FOR YOUR MOOD',
+      sectionTitle: 'Find something worth pressing play on.',
+      searchPlaceholder: 'Search artists, songs, playlists...',
+      heroTag: 'NOW PLAYING',
+      heroHeadline: 'Your sound, your space.',
+      heroSubline: 'Discover tracks, organize playlists and keep your favorite audio close.',
+      visualIcon: Music,
+      visualLabel: 'PLAYING NOW',
+      visualTitle: 'Focus Session',
+      visualMeta: '42 tracks · 2h 18m',
+      metricLabels: ['Playlists', 'Favorites', 'Minutes'],
+    }
+  }
+
+  return {
+    category: 'generic',
+    kicker: 'YOUR NEW PRODUCT',
+    nav: ['Overview', 'Explore', 'Workspace'],
+    primaryCta: 'Get started',
+    secondaryCta: 'Explore features',
+    sectionLabel: 'BUILT AROUND YOUR IDEA',
+    sectionTitle: 'A focused experience made for your users.',
+    searchPlaceholder: `Search ${appName.toLowerCase()}...`,
+    heroTag: 'FEATURED',
+    heroHeadline: 'Built around your idea.',
+    heroSubline: summary,
+    visualIcon: BriefcaseBusiness,
+    visualLabel: 'PRODUCT',
+    visualTitle: appName,
+    visualMeta: 'Designed from your AI blueprint',
+    metricLabels: ['Features', 'Workflows', 'Users'],
+  }
+}
+
+function PrototypeWebsite({ appName, summary, features, selectedTheme, onClose }: PrototypeWebsiteProps) {
+  const profile = getPrototypeProfile(appName, summary, features)
+  const VisualIcon = profile.visualIcon
+  const featureIcons = profile.category === 'fitness'
+    ? [Dumbbell, HeartPulse, CalendarDays, Star, Camera]
+    : profile.category === 'books' || profile.category === 'education'
+      ? [BookOpen, GraduationCapIcon, Star, CalendarDays, MapPin]
+      : profile.category === 'food'
+        ? [Utensils, HeartPulse, Star, CalendarDays, Camera]
+        : profile.category === 'travel'
+          ? [Plane, MapPin, Camera, CalendarDays, Star]
+          : profile.category === 'finance'
+            ? [WalletCards, BriefcaseBusiness, CalendarDays, Star, HeartPulse]
+            : profile.category === 'shopping'
+              ? [ShoppingBag, Star, Camera, WalletCards, MapPin]
+              : profile.category === 'music'
+                ? [Music, Star, Camera, CalendarDays, HeartPulse]
+                : [BriefcaseBusiness, Star, CalendarDays, MapPin, Camera]
+
+  return (
+    <div className={`app-preview theme-${selectedTheme}`}>
+      <div className="preview-topbar">
+        <div className="preview-brand">
+          <span className="preview-logo"><VisualIcon size={15} /></span>
+          <strong>{appName}</strong>
+        </div>
+        <nav className="preview-nav">
+          {profile.nav.map((item) => <span key={item}>{item}</span>)}
+        </nav>
+        <button className="preview-close" onClick={onClose}>Close preview</button>
+      </div>
+
+      <div className={`preview-site preview-category-${profile.category}`}>
+        <section className="preview-hero">
+          <div className="preview-hero-copy">
+            <span className="preview-kicker">{profile.kicker}</span>
+            <h2>{profile.heroHeadline}</h2>
+            <p>{profile.heroSubline}</p>
+            <div className="preview-actions">
+              <button className="preview-primary">{profile.primaryCta} <ArrowRight size={15} /></button>
+              <button className="preview-secondary">{profile.secondaryCta}</button>
+            </div>
+          </div>
+
+          <div className="preview-hero-art">
+            <div className="hero-art-card">
+              <span>{profile.heroTag}</span>
+              <VisualIcon size={30} className="hero-topic-icon" />
+              <strong>{profile.visualTitle}</strong>
+              <small>{profile.visualMeta}</small>
+              <div className="hero-progress"><span /></div>
+            </div>
+            <div className="hero-orbit one" />
+            <div className="hero-orbit two" />
+          </div>
+        </section>
+
+        <section className="preview-toolbar">
+          <div>
+            <span>{profile.sectionLabel}</span>
+            <strong>{profile.sectionTitle}</strong>
+          </div>
+          <div className="preview-search">⌕ {profile.searchPlaceholder}</div>
+        </section>
+
+        <section className="preview-topic-showcase">
+          <div className="topic-feature-visual">
+            <div className="topic-visual-glow" />
+            <VisualIcon size={48} />
+            <span>{profile.visualLabel}</span>
+            <strong>{profile.visualTitle}</strong>
+            <small>{profile.visualMeta}</small>
+          </div>
+
+          <div className="topic-metrics">
+            {profile.metricLabels.map((label, index) => (
+              <div className="topic-metric" key={label}>
+                <span>0{index + 1}</span>
+                <strong>{index === 0 ? (profile.category === 'fitness' ? '4' : profile.category === 'books' ? '24' : profile.category === 'travel' ? '12' : '18') : index === 1 ? '68%' : '92%'}</strong>
+                <small>{label}</small>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="preview-cards">
+          {features.map((feature, index) => {
+            const FeatureIcon = featureIcons[index % featureIcons.length]
+            return (
+              <article className="preview-card" key={feature}>
+                <div className="preview-card-visual">
+                  <div className="preview-card-visual-glow" />
+                  <FeatureIcon size={27} />
+                  <span>0{String(index + 1)}</span>
+                </div>
+                <div className="preview-card-meta">{profile.category.toUpperCase()} · {String(index + 1).padStart(2, '0')}</div>
+                <h3>{feature}</h3>
+                <p>Designed as a real part of the {appName} experience.</p>
+                <button>Open feature <ArrowRight size={13} /></button>
+              </article>
+            )
+          })}
+        </section>
+
+        <section className="preview-cta">
+          <div>
+            <span>{profile.kicker}</span>
+            <h3>Everything is ready for your first real workflow.</h3>
+          </div>
+          <button className="preview-primary">{profile.primaryCta} <ArrowRight size={15} /></button>
+        </section>
+
+        <footer className="preview-footer">
+          <span><VisualIcon size={13} /> {appName}</span>
+          <span>Prototype generated from the approved product blueprint</span>
+        </footer>
+      </div>
     </div>
   )
 }
