@@ -112,10 +112,10 @@ Rules:
 - If a backend/API/database is unnecessary for the MVP, say so rather than forcing one.
 """
 
-    full_prompt = f"{system_prompt}
+    full_prompt = f"""{system_prompt}
 
 User app idea:
-{prompt}"
+{prompt}"""
 
     models = [
         "gemini-3.8-flash",
