@@ -1,2880 +1,981 @@
 import { useState } from 'react'
-
-
-
 import {
-
-
-
   Sparkles,
-
-
-
   Brain,
-
-
-
   ClipboardList,
-
-
-
   Hammer,
-
-
-
   Search,
-
-
-
   GraduationCap,
-
-
-
   ArrowRight,
-
-
-
   Plus,
-
-
-
   ChevronRight,
-
-
-
   WandSparkles,
-
-
-
   Check,
-
-
-
   RotateCcw,
-
-
-
+  Palette,
+  Dumbbell,
+  BookOpen,
+  Utensils,
+  Plane,
+  WalletCards,
+  HeartPulse,
+  BriefcaseBusiness,
+  ShoppingBag,
+  MapPin,
+  CalendarDays,
+  Star,
+  Camera,
+  Music,
+  GraduationCap as GraduationCapIcon,
 } from 'lucide-react'
-
-
-
 import './App.css'
 
-
-
-
-
-
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 const stages = [
-
-
-
   { id: 'understand', label: 'Understand', icon: Brain },
-
-
-
   { id: 'plan', label: 'Plan', icon: ClipboardList },
-
-
-
   { id: 'build', label: 'Build', icon: Hammer },
-
-
-
   { id: 'explain', label: 'Explain', icon: Search },
-
-
-
   { id: 'learn', label: 'Learn', icon: GraduationCap },
-
-
-
 ]
 
+type Item = { name: string; purpose: string }
 
+type ThemeId = 'ocean' | 'midnight' | 'sunset' | 'forest'
 
-
-
-
+const prototypeThemes: Array<{
+  id: ThemeId
+  name: string
+  description: string
+  swatchClass: string
+}> = [
+  { id: 'ocean', name: 'Ocean Glass', description: 'Clean, cool and modern', swatchClass: 'theme-swatch-ocean' },
+  { id: 'midnight', name: 'Midnight Neon', description: 'Bold dark developer style', swatchClass: 'theme-swatch-midnight' },
+  { id: 'sunset', name: 'Sunset Studio', description: 'Warm, creative and expressive', swatchClass: 'theme-swatch-sunset' },
+  { id: 'forest', name: 'Forest Calm', description: 'Natural, focused and premium', swatchClass: 'theme-swatch-forest' },
+]
 
 type Understanding = {
-
-
-
   appName: string
-
-
-
   summary: string
-
-
-
   users: string
-
-
-
   problem: string
-
-
-
   goal: string
-
-
-
-  platform: string
-
-
-
   features: string[]
-
-
-
+  platform: string
+  plan: {
+    frontend: string
+    backend: string
+    data: string
+    screens: Item[]
+    architecture: Item[]
+    apiEndpoints: Item[]
+  }
+  explain: {
+    frontend: string
+    backend: string
+    data: string
+    technicalDecisions: Item[]
+    components: Item[]
+  }
+  learn: {
+    path: Item[]
+    exercises: Item[]
+  }
 }
 
-
-
-
-
-
-
 function App() {
-
-
-
   const [prompt, setPrompt] = useState('')
-
-
-
   const [activeStage, setActiveStage] = useState('understand')
-
-
-
   const [started, setStarted] = useState(false)
-
-
-
   const [confirmed, setConfirmed] = useState(false)
-
-
-
   const [selectedPlatform, setSelectedPlatform] = useState('Web')
-
-
-
-  const [isBuilding, setIsBuilding] = useState(false)
-
-
-
-const [prototypeReady, setPrototypeReady] = useState(false)
-
-
-
-const [previewOpen, setPreviewOpen] = useState(false)
-
-
-
-
-
-
-
-  const [understanding, setUnderstanding] = useState<Understanding | null>(
-
-
-
-    null,
-
-
-
-  )
-
-
-
-
-
-
-
-  
   const [isGeneratingAI, setIsGeneratingAI] = useState(false)
+  const [understanding, setUnderstanding] = useState<Understanding | null>(null)
+  const [isBuilding, setIsBuilding] = useState(false)
+  const [prototypeReady, setPrototypeReady] = useState(false)
+  const [previewOpen, setPreviewOpen] = useState(false)
+  const [selectedTheme, setSelectedTheme] = useState<ThemeId>('ocean')
 
-  const [aiError, setAiError] = useState('')
   const generateUnderstanding = async () => {
-
     if (!prompt.trim() || isGeneratingAI) return
-
     setIsGeneratingAI(true)
-    setAiError('')
 
     try {
-      const response = await fetch('http://localhost:8000/api/analyze', {
+      const response = await fetch(`${API_URL}/api/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: prompt.trim() }),
       })
-
       const data = await response.json()
 
       if (!response.ok) {
         throw new Error(data.detail || 'AI analysis failed. Please try again.')
       }
 
-      setUnderstanding({
-        appName: data.appName,
-        summary: data.summary,
-        users: data.users,
-        problem: data.problem,
-        goal: data.goal,
-        platform: selectedPlatform,
-        features: data.features,
-      })
-
+      setUnderstanding({ ...data, platform: selectedPlatform })
       setStarted(true)
       setConfirmed(false)
       setPrototypeReady(false)
       setPreviewOpen(false)
       setActiveStage('understand')
-    } catch (error) {
-      setAiError(
-        error instanceof Error
-          ? error.message
-          : 'Unable to connect to the AI service.',
-      )
+    } catch {
+      // Detailed provider/runtime failures stay in the backend terminal/logs.
+      // Do not expose infrastructure errors inside the product UI.
     } finally {
       setIsGeneratingAI(false)
     }
   }
 
-
   const confirmRequirements = () => {
-
-
-
-  if (!understanding) return
-
-
-
-
-
-
-
-  setUnderstanding({
-
-
-
-    ...understanding,
-
-
-
-    platform: selectedPlatform,
-
-
-
-  })
-
-
-
-
-
-
-
-  setConfirmed(true)
-
-
-
-  setActiveStage('plan')
-
-
-
-}
-
-
-
-
-
-
+    if (!understanding) return
+    setUnderstanding({ ...understanding, platform: selectedPlatform })
+    setConfirmed(true)
+    setActiveStage('plan')
+  }
 
   const generatePrototype = () => {
-
     setIsBuilding(true)
-
     setPrototypeReady(false)
-
     setPreviewOpen(false)
-
-
-
     setTimeout(() => {
-
       setIsBuilding(false)
-
       setPrototypeReady(true)
-
     }, 3000)
-
   }
-
-
 
   const resetProject = () => {
-
-
-
     setPrompt('')
-
-
-
     setStarted(false)
-
-
-
     setConfirmed(false)
-
-
-
     setUnderstanding(null)
-
-
-
     setActiveStage('understand')
-
     setIsBuilding(false)
-
     setPrototypeReady(false)
-
     setPreviewOpen(false)
-
-
-
+    setSelectedTheme('ocean')
   }
 
-
-
-
-
-
+  const goTo = (stage: string) => {
+    if (stage === 'understand' || confirmed) setActiveStage(stage)
+  }
 
   return (
-
-
-
     <div className="app-shell">
-
-
-
-      {/* Sidebar */}
-
-
-
       <aside className="sidebar">
-
-
-
         <div className="brand">
-
-
-
-          <div className="brand-mark">
-
-
-
-            <Sparkles size={18} />
-
-
-
-          </div>
-
-
-
-
-
-
-
+          <div className="brand-mark"><Sparkles size={18} /></div>
           <div>
-
-
-
             <div className="brand-name">Build Your Own App</div>
-
-
-
             <div className="brand-caption">AI development workspace</div>
-
-
-
           </div>
-
-
-
         </div>
-
-
-
-
-
-
 
         <div className="workspace-label">WORKSPACE</div>
-
-
-
-
-
-
-
         <button className="new-project" onClick={resetProject}>
-
-
-
-          <Plus size={17} />
-
-
-
-          New project
-
-
-
+          <Plus size={17} /> New project
         </button>
 
-
-
-
-
-
-
         <nav className="stage-nav">
-
-
-
           {stages.map((stage, index) => {
-
-
-
             const Icon = stage.icon
-
-
-
-            const isActive = activeStage === stage.id
-
-
-
-
-
-
-
+            const active = activeStage === stage.id
             return (
-
-
-
-              <button
-
-
-
-                key={stage.id}
-
-
-
-                className={`stage-item ${isActive ? 'active' : ''}`}
-
-
-
-                onClick={() => {
-
-
-
-                  if (stage.id === 'understand' || confirmed) {
-
-
-
-                    setActiveStage(stage.id)
-
-
-
-                  }
-
-
-
-                }}
-
-
-
-              >
-
-
-
+              <button key={stage.id} className={`stage-item ${active ? 'active' : ''}`} onClick={() => goTo(stage.id)}>
                 <span className="stage-number">0{index + 1}</span>
-
-
-
-
-
-
-
                 <Icon size={17} />
-
-
-
-
-
-
-
                 <span>{stage.label}</span>
-
-
-
-
-
-
-
-                {isActive && (
-
-
-
-                  <ChevronRight size={15} className="stage-arrow" />
-
-
-
-                )}
-
-
-
+                {active && <ChevronRight size={15} className="stage-arrow" />}
               </button>
-
-
-
             )
-
-
-
           })}
-
-
-
         </nav>
 
-
-
-
-
-
-
         <div className="sidebar-bottom">
-
-
-
           <div className="ai-status">
-
-
-
-            <span className="status-dot"></span>
-
-
-
-
-
-
-
-            <div>
-
-
-
-              <strong>AI ready</strong>
-
-
-
-              <small>Development assistant online</small>
-
-
-
-            </div>
-
-
-
+            <span className="status-dot" />
+            <div><strong>AI ready</strong><small>Development assistant online</small></div>
           </div>
-
-
-
-
-
-
-
-          <div className="version">Build Your Own App · v0.1</div>
-
-
-
+          <div className="version">Build Your Own App · v0.2</div>
         </div>
-
-
-
       </aside>
 
-
-
-
-
-
-
-      {/* Main */}
-
-
-
       <main className="main-content">
-
-
-
         <header className="topbar">
-
-
-
           <div className="breadcrumb">
-
-
-
-            Workspace <span>/</span>
-
-
-
-            {started ? understanding?.appName : 'New project'}
-
-
-
+            Workspace <span>/</span>{started ? understanding?.appName : 'New project'}
           </div>
-
-
-
-
-
-
-
           <div className="top-actions">
-
-
-
-            <span className="autosave">
-
-
-
-              <span className="save-dot"></span>
-
-
-
-              Autosaved
-
-
-
-            </span>
-
-
-
-
-
-
-
+            <span className="autosave"><span className="save-dot" /> Autosaved</span>
             <button className="avatar">NP</button>
-
-
-
           </div>
-
-
-
         </header>
 
-
-
-
-
-
-
         <section className="content">
-
-
-
-          {/* LANDING */}
-
-
-
           {!started && (
-
-
-
             <>
-
-
-
               <div className="hero-section">
-
-
-
-                <div className="eyebrow">
-
-
-
-                  <WandSparkles size={15} />
-
-
-
-                  AI-powered app development
-
-
-
-                </div>
-
-
-
-
-
-
-
-                <h1>
-
-
-
-                  Build your own app.
-
-
-
-                  <br />
-
-
-
-                  <span>Understand every step.</span>
-
-
-
-                </h1>
-
-
-
-
-
-
-
+                <div className="eyebrow"><WandSparkles size={15} /> AI-powered app development</div>
+                <h1>Build your own app.<br /><span>Understand every step.</span></h1>
                 <p className="hero-description">
-
-
-
-                  Turn an idea into a working application while AI guides you
-
-
-
-                  through understanding, planning, building, explaining and
-
-
-
-                  learning.
-
-
-
+                  Turn an idea into a working application while AI guides you through understanding,
+                  planning, building, explaining and learning.
                 </p>
-
-
-
               </div>
-
-
-
-
-
-
 
               <div className="prompt-card">
-
-
-
                 <div className="prompt-header">
-
-
-
                   <div>
-
-
-
                     <span className="prompt-label">START WITH AN IDEA</span>
-
-
-
-
-
-
-
                     <h2>What do you want to build?</h2>
-
-
-
                   </div>
-
-
-
-
-
-
-
-                  <div className="prompt-badge">
-
-
-
-                    <Sparkles size={14} />
-
-
-
-                    AI guided
-
-
-
-                  </div>
-
-
-
+                  <div className="prompt-badge"><Sparkles size={14} /> AI guided</div>
                 </div>
-
-
-
-
-
-
 
                 <textarea
-
-
-
                   value={prompt}
-
-
-
                   onChange={(e) => setPrompt(e.target.value)}
-
-
-
                   placeholder="Describe your app idea in your own words..."
-
-
-
                   rows={5}
-
-
-
                 />
 
-
-
-
-
-
-
-                {aiError && (
-                  <div className="ai-error">
-                    {aiError}
-                  </div>
-                )}
-
                 <div className="prompt-footer">
-
-
-
-                  <span>
-
-
-
-                    Don't worry about technical details. We'll figure them out
-
-
-
-                    together.
-
-
-
-                  </span>
-
-
-
-
-
-
-
-                  <button
-
-
-
-                    className="start-button"
-
-
-
-                    onClick={generateUnderstanding}
-
-
-
-                    disabled={!prompt.trim() || isGeneratingAI}
-
-
-
-                  >
-
+                  <span>Don't worry about technical details. We'll figure them out together.</span>
+                  <button className="start-button" onClick={generateUnderstanding} disabled={!prompt.trim() || isGeneratingAI}>
                     {isGeneratingAI ? 'Understanding your idea...' : 'Start building'}
-
                     {!isGeneratingAI && <ArrowRight size={17} />}
-
-
-
                   </button>
-
-
-
                 </div>
-
-
-
               </div>
-
-
-
-
-
-
 
               <div className="journey">
-
-
-
                 <div className="journey-heading">
-
-
-
-                  <div>
-
-
-
-                    <span className="section-label">THE JOURNEY</span>
-
-
-
-
-
-
-
-                    <h3>From idea to understanding</h3>
-
-
-
-                  </div>
-
-
-
-
-
-
-
+                  <div><span className="section-label">THE JOURNEY</span><h3>From idea to understanding</h3></div>
                   <span className="journey-count">5 stages</span>
-
-
-
                 </div>
-
-
-
-
-
-
-
                 <div className="journey-grid">
-
-
-
                   {stages.map((stage, index) => {
-
-
-
                     const Icon = stage.icon
-
-
-
-
-
-
-
+                    const descriptions = [
+                      'Turn your idea into clear requirements.',
+                      'Create the features, screens and architecture.',
+                      'Generate the application and bring it to life.',
+                      'Understand the code and technical decisions.',
+                      'Learn how to modify and extend your app.',
+                    ]
                     return (
-
-
-
                       <div className="journey-card" key={stage.id}>
-
-
-
-                        <div className="journey-icon">
-
-
-
-                          <Icon size={19} />
-
-
-
-                        </div>
-
-
-
-
-
-
-
+                        <div className="journey-icon"><Icon size={19} /></div>
                         <span className="journey-number">0{index + 1}</span>
-
-
-
-
-
-
-
                         <h4>{stage.label}</h4>
-
-
-
-
-
-
-
-                        <p>
-
-
-
-                          {index === 0 &&
-
-
-
-                            'Turn your idea into clear requirements.'}
-
-
-
-
-
-
-
-                          {index === 1 &&
-
-
-
-                            'Create the features, screens and architecture.'}
-
-
-
-
-
-
-
-                          {index === 2 &&
-
-
-
-                            'Generate the application and bring it to life.'}
-
-
-
-
-
-
-
-                          {index === 3 &&
-
-
-
-                            'Understand the code and technical decisions.'}
-
-
-
-
-
-
-
-                          {index === 4 &&
-
-
-
-                            'Learn how to modify and extend your app.'}
-
-
-
-                        </p>
-
-
-
+                        <p>{descriptions[index]}</p>
                       </div>
-
-
-
                     )
-
-
-
                   })}
-
-
-
                 </div>
-
-
-
               </div>
-
-
-
             </>
-
-
-
           )}
 
-
-
-
-
-
-
-          {/* UNDERSTAND */}
-
-
-
-          {started && activeStage === 'understand' && understanding && (
-
-
-
-            <div className="working-area">
-
-
-
-              <div className="working-header">
-
-
-
-                <div>
-
-
-
-                  <span className="section-label">01 · UNDERSTAND</span>
-
-
-
-
-
-
-
-                  <h1>Let's understand your idea.</h1>
-
-
-
-
-
-
-
-                  <p>{understanding.summary}</p>
-
-
-
-                </div>
-
-
-
-
-
-
-
-                <button className="change-button" onClick={resetProject}>
-
-
-
-                  <RotateCcw size={13} />
-
-
-
-                  Start over
-
-
-
-                </button>
-
-
-
-              </div>
-
-
-
-
-
-
-
-              {/* Progress */}
-
-
-
-              <div className="progress-line">
-
-
-
-                {stages.map((stage, index) => {
-
-
-
-                  const Icon = stage.icon
-
-
-
-
-
-
-
-                  return (
-
-
-
-                    <button
-
-
-
-                      key={stage.id}
-
-
-
-                      className={`progress-stage ${
-
-
-
-                        activeStage === stage.id ? 'current' : ''
-
-
-
-                      }`}
-
-
-
-                      onClick={() => {
-
-
-
-                        if (stage.id === 'understand' || confirmed) {
-
-
-
-                          setActiveStage(stage.id)
-
-
-
-                        }
-
-
-
-                      }}
-
-
-
-                    >
-
-
-
-                      <span>
-
-
-
-                        <Icon size={16} />
-
-
-
-                      </span>
-
-
-
-
-
-
-
-                      <div>
-
-
-
-                        <small>0{index + 1}</small>
-
-
-
-                        <strong>{stage.label}</strong>
-
-
-
-                      </div>
-
-
-
-                    </button>
-
-
-
-                  )
-
-
-
-                })}
-
-
-
-              </div>
-
-
-
-
-
-
-
-              {/* AI understanding */}
-
-
-
-              <div className="ai-panel">
-
-
-
-                <div className="ai-panel-icon">
-
-
-
-                  <Sparkles size={20} />
-
-
-
-                </div>
-
-
-
-
-
-
-
-                <div>
-
-
-
-                  <span className="section-label">
-
-
-
-                    AI DEVELOPMENT ASSISTANT
-
-
-
-                  </span>
-
-
-
-
-
-
-
-                  <h2>Here's what I understand.</h2>
-
-
-
-
-
-
-
-                  <p>
-
-
-
-                    I've converted your idea into an initial product
-
-
-
-                    understanding. Review it before we create the technical
-
-
-
-                    plan.
-
-
-
-                  </p>
-
-
-
-                </div>
-
-
-
-              </div>
-
-
-
-
-
-
-
-              {/* Understanding cards */}
-
-
-
-              <div className="understanding-grid">
-
-
-
-                <div className="understanding-card">
-
-
-
-                  <span>APP</span>
-
-
-
-                  <h3>{understanding.appName}</h3>
-
-
-
-                  <p>{understanding.summary}</p>
-
-
-
-                </div>
-
-
-
-
-
-
-
-                <div className="understanding-card">
-
-
-
-                  <span>TARGET USERS</span>
-
-
-
-                  <h3>{understanding.users}</h3>
-
-
-
-                  <p>Primary users this application is designed for.</p>
-
-
-
-                </div>
-
-
-
-
-
-
-
-                <div className="understanding-card">
-
-
-
-                  <span>PROBLEM</span>
-
-
-
-                  <h3>{understanding.problem}</h3>
-
-
-
-                  <p>The main problem the product aims to solve.</p>
-
-
-
-                </div>
-
-
-
-
-
-
-
-                <div className="understanding-card">
-
-
-
-                  <span>GOAL</span>
-
-
-
-                  <h3>{understanding.goal}</h3>
-
-
-
-                  <p>The intended outcome of the application.</p>
-
-
-
-                </div>
-
-
-
-              </div>
-
-
-
-
-
-
-
-              {/* Features */}
-
-
-
-              <div className="question-card">
-
-
-
-                <span className="question-number">CORE FEATURES</span>
-
-
-
-
-
-
-
-                <h3>What the first version should include</h3>
-
-
-
-
-
-
-
-                <div className="feature-list">
-
-
-
-                  {understanding.features.map((feature) => (
-
-
-
-                    <div className="feature-item" key={feature}>
-
-
-
-                      <span className="feature-check">
-
-
-
-                        <Check size={13} />
-
-
-
-                      </span>
-
-
-
-
-
-
-
-                      {feature}
-
-
-
-                    </div>
-
-
-
-                  ))}
-
-
-
-                </div>
-
-
-
-              </div>
-
-
-
-
-
-
-
-              {/* Platform */}
-
-
-
-              <div className="question-card">
-
-
-
-                <span className="question-number">01 · CLARIFY</span>
-
-
-
-
-
-
-
-                <h3>Where should this app run?</h3>
-
-
-
-
-
-
-
-                <p>
-
-
-
-                  Choosing the platform helps us make better architecture and
-
-
-
-                  UI decisions.
-
-
-
-                </p>
-
-
-
-
-
-
-
-                <div className="answer-options">
-
-
-
-                  {['Web', 'Mobile', 'Both'].map((platform) => (
-
-
-
-                    <button
-
-
-
-                      key={platform}
-
-
-
-                      className={
-
-
-
-                        selectedPlatform === platform ? 'selected-answer' : ''
-
-
-
-                      }
-
-
-
-                      onClick={() => setSelectedPlatform(platform)}
-
-
-
-                    >
-
-
-
-                      {platform}
-
-
-
-                    </button>
-
-
-
-                  ))}
-
-
-
-                </div>
-
-
-
-              </div>
-
-
-
-
-
-
-
-              {/* Continue */}
-
-
-
-              <div className="continue-row">
-
-
-
-                <div>
-
-
-
-                  <span className="section-label">NEXT STEP</span>
-
-
-
-
-
-
-
-                  <p>
-
-
-
-                    Once you're happy with the requirements, we'll create the
-
-
-
-                    technical blueprint.
-
-
-
-                  </p>
-
-
-
-                </div>
-
-
-
-
-
-
-
-                <button
-
-
-
-                  className="start-button"
-
-
-
-                  onClick={confirmRequirements}
-
-
-
-                >
-
-
-
-                  Confirm & continue
-
-
-
-                  <ArrowRight size={17} />
-
-
-
-                </button>
-
-
-
-              </div>
-
-
-
-            </div>
-
-
-
-          )}
-
-
-
-
-
-
-
-          {/* PLAN */}
-
-
-
-          {started && activeStage === 'plan' && confirmed && understanding && (
-
-
-
-            <div className="working-area">
-
-
-
-              <div className="working-header">
-
-
-
-                <div>
-
-
-
-                  <span className="section-label">02 · PLAN</span>
-
-
-
-
-
-
-
-                  <h1>Let's plan your app.</h1>
-
-
-
-
-
-
-
-                  <p>
-
-
-
-                    Here's the technical blueprint based on your confirmed
-
-
-
-                    requirements.
-
-
-
-                  </p>
-
-
-
-                </div>
-
-
-
-              </div>
-
-
-
-
-
-
-
-              <div className="progress-line">
-
-
-
-                {stages.map((stage, index) => {
-
-
-
-                  const Icon = stage.icon
-
-
-
-
-
-
-
-                  return (
-
-
-
-                    <button
-
-
-
-                      key={stage.id}
-
-
-
-                      className={`progress-stage ${
-
-
-
-                        activeStage === stage.id ? 'current' : ''
-
-
-
-                      }`}
-
-
-
-                      onClick={() => setActiveStage(stage.id)}
-
-
-
-                    >
-
-
-
-                      <span>
-
-
-
-                        <Icon size={16} />
-
-
-
-                      </span>
-
-
-
-
-
-
-
-                      <div>
-
-
-
-                        <small>0{index + 1}</small>
-
-
-
-                        <strong>{stage.label}</strong>
-
-
-
-                      </div>
-
-
-
-                    </button>
-
-
-
-                  )
-
-
-
-                })}
-
-
-
-              </div>
-
-
-
-
-
-
-
-              <div className="ai-panel">
-
-
-
-                <div className="ai-panel-icon">
-
-
-
-                  <ClipboardList size={20} />
-
-
-
-                </div>
-
-
-
-
-
-
-
-                <div>
-
-
-
-                  <span className="section-label">AI APP PLANNER</span>
-
-
-
-
-
-
-
-                  <h2>Your development blueprint is ready.</h2>
-
-
-
-
-
-
-
-                  <p>
-
-
-
-                    The next stage will transform your product idea into
-
-
-
-                    screens, features, architecture and a development plan.
-
-
-
-                  </p>
-
-
-
-                </div>
-
-
-
-              </div>
-
-
-
-
-
-
-
-              <div className="plan-grid">
-
-
-
-                <div className="plan-card">
-
-
-
-                  <span>PLATFORM</span>
-
-
-
-                  <h3>{understanding.platform}</h3>
-
-
-
-                </div>
-
-
-
-
-
-
-
-                <div className="plan-card">
-
-
-
-                  <span>FRONTEND</span>
-
-
-
-                  <h3>React + TypeScript</h3>
-
-
-
-                </div>
-
-
-
-
-
-
-
-                <div className="plan-card">
-
-
-
-                  <span>BACKEND</span>
-
-
-
-                  <h3>API + AI services</h3>
-
-
-
-                </div>
-
-
-
-
-
-
-
-                <div className="plan-card">
-
-
-
-                  <span>DATA</span>
-
-
-
-                  <h3>Structured application data</h3>
-
-
-
-                </div>
-
-
-
-              </div>
-
-
-
-
-
-
-
-              <div className="question-card">
-
-
-
-                <span className="question-number">APP BLUEPRINT</span>
-
-
-
-
-
-
-
-                <h3>Suggested development structure</h3>
-
-
-
-
-
-
-
-                <div className="blueprint-list">
-
-
-
-                  {[
-
-
-
-                    'Authentication & onboarding',
-
-
-
-                    'Main application dashboard',
-
-
-
-                    ...understanding.features,
-
-
-
-                    'Profile and settings',
-
-
-
-                  ].map((item, index) => (
-
-
-
-                    <div className="blueprint-item" key={`${item}-${index}`}>
-
-
-
-                      <span>0{index + 1}</span>
-
-
-
-                      {item}
-
-
-
-                    </div>
-
-
-
-                  ))}
-
-
-
-                </div>
-
-
-
-              </div>
-
-
-
-
-
-
-
-              <div className="continue-row">
-
-
-
-                <div>
-
-
-
-                  <span className="section-label">NEXT STEP</span>
-
-
-
-
-
-
-
-                  <p>
-
-
-
-                    After planning, AI will generate the first working
-
-
-
-                    prototype.
-
-
-
-                  </p>
-
-
-
-                </div>
-
-
-
-
-
-
-
-                <button
-
-
-
-                  className="start-button"
-
-
-
-                  onClick={() => setActiveStage('build')}
-
-
-
-                >
-
-
-
-                  Continue to Build
-
-
-
-                  <ArrowRight size={17} />
-
-
-
-                </button>
-
-
-
-              </div>
-
-
-
-            </div>
-
-
-
-          )}
-
-
-
-
-
-
-
-          {/* BUILD */}
-
-          {started && activeStage === 'build' && confirmed && understanding && (
-
-            <div className="working-area">
-
-              <div className="working-header">
-
-                <div>
-
-                  <span className="section-label">03 · BUILD</span>
-
-                  <h1>Build your app.</h1>
-
-                  <p>Turn your approved blueprint into a working prototype.</p>
-
-                </div>
-
-              </div>
-
-
-
-              <div className="progress-line">
-
-                {stages.map((stage, index) => {
-
-                  const Icon = stage.icon
-
-                  return (
-
-                    <button
-
-                      key={stage.id}
-
-                      className={`progress-stage ${activeStage === stage.id ? 'current' : ''}`}
-
-                      onClick={() => setActiveStage(stage.id)}
-
-                    >
-
-                      <span><Icon size={16} /></span>
-
-                      <div>
-
-                        <small>0{index + 1}</small>
-
-                        <strong>{stage.label}</strong>
-
-                      </div>
-
-                    </button>
-
-                  )
-
-                })}
-
-              </div>
-
-
-
-              {!prototypeReady && !isBuilding && (
-
-                <>
-
-                  <div className="ai-panel">
-
-                    <div className="ai-panel-icon"><Hammer size={20} /></div>
-
-                    <div>
-
-                      <span className="section-label">AI BUILD ENGINE</span>
-
-                      <h2>Your blueprint is ready.</h2>
-
-                      <p>I'll turn your requirements and technical plan into a working application prototype.</p>
-
-                    </div>
-
+          {started && understanding && (
+            <>
+              <div className="working-area">
+                <div className="working-header">
+                  <div>
+                    <span className="section-label">
+                      0{stages.findIndex((s) => s.id === activeStage) + 1} · {activeStage.toUpperCase()}
+                    </span>
+                    <h1>
+                      {activeStage === 'understand' && "Let's understand your idea."}
+                      {activeStage === 'plan' && "Let's plan your app."}
+                      {activeStage === 'build' && 'Build your app.'}
+                      {activeStage === 'explain' && 'Understand what AI built.'}
+                      {activeStage === 'learn' && 'Learn how to extend your app.'}
+                    </h1>
+                    <p>{understanding.summary}</p>
                   </div>
+                  {activeStage === 'understand' && (
+                    <button className="change-button" onClick={resetProject}><RotateCcw size={13} /> Start over</button>
+                  )}
+                </div>
 
+                <div className="progress-line">
+                  {stages.map((stage, index) => {
+                    const Icon = stage.icon
+                    return (
+                      <button key={stage.id} className={`progress-stage ${activeStage === stage.id ? 'current' : ''}`} onClick={() => goTo(stage.id)}>
+                        <span><Icon size={16} /></span>
+                        <div><small>0{index + 1}</small><strong>{stage.label}</strong></div>
+                      </button>
+                    )
+                  })}
+                </div>
 
-
-                  <div className="build-summary">
-
-                    <div className="build-summary-header">
-
+                {activeStage === 'understand' && (
+                  <>
+                    <div className="ai-panel">
+                      <div className="ai-panel-icon"><Sparkles size={20} /></div>
                       <div>
-
-                        <span className="section-label">PROJECT BLUEPRINT</span>
-
-                        <h3>{understanding.appName}</h3>
-
+                        <span className="section-label">AI DEVELOPMENT ASSISTANT</span>
+                        <h2>Here's what I understand.</h2>
+                        <p>Gemini converted your idea into a structured product definition. Review it before the AI creates the technical plan.</p>
                       </div>
-
-                      <span className="platform-pill">{understanding.platform}</span>
-
                     </div>
 
+                    <div className="understanding-grid">
+                      {[
+                        ['APP', understanding.appName, understanding.summary],
+                        ['TARGET USERS', understanding.users, 'Primary users this application is designed for.'],
+                        ['PROBLEM', understanding.problem, 'The main problem the product aims to solve.'],
+                        ['GOAL', understanding.goal, 'The intended outcome of the application.'],
+                      ].map(([label, title, text]) => (
+                        <div className="understanding-card" key={label}>
+                          <span>{label}</span><h3>{title}</h3><p>{text}</p>
+                        </div>
+                      ))}
+                    </div>
 
+                    <div className="question-card">
+                      <span className="question-number">CORE FEATURES · AI GENERATED</span>
+                      <h3>What the first version should include</h3>
+                      <div className="feature-list">
+                        {understanding.features.map((feature) => (
+                          <div className="feature-item" key={feature}><span className="feature-check"><Check size={13} /></span>{feature}</div>
+                        ))}
+                      </div>
+                    </div>
 
-                    <div className="build-feature-list">
+                    <div className="question-card">
+                      <span className="question-number">01 · CLARIFY</span>
+                      <h3>Where should this app run?</h3>
+                      <p>Choosing the platform helps us make better architecture and UI decisions.</p>
+                      <div className="answer-options">
+                        {['Web', 'Mobile', 'Both'].map((platform) => (
+                          <button key={platform} className={selectedPlatform === platform ? 'selected-answer' : ''} onClick={() => setSelectedPlatform(platform)}>
+                            {platform}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
 
-                      {understanding.features.map((feature, index) => (
+                    <div className="continue-row">
+                      <div><span className="section-label">NEXT STEP</span><p>Confirm the requirements, then inspect the AI-generated technical blueprint.</p></div>
+                      <button className="start-button" onClick={confirmRequirements}>Confirm & continue <ArrowRight size={17} /></button>
+                    </div>
+                  </>
+                )}
 
-                        <div className="build-feature" key={feature}>
+                {activeStage === 'plan' && confirmed && (
+                  <>
+                    <div className="ai-panel">
+                      <div className="ai-panel-icon"><ClipboardList size={20} /></div>
+                      <div>
+                        <span className="section-label">AI APP PLANNER</span>
+                        <h2>Your development blueprint is ready.</h2>
+                        <p>Gemini translated the confirmed requirements into screens, architecture, data and API plans for the MVP.</p>
+                      </div>
+                    </div>
 
-                          <span>0{index + 1}</span>
+                    <div className="plan-grid">
+                      <div className="plan-card"><span>PLATFORM</span><h3>{understanding.platform}</h3></div>
+                      <div className="plan-card"><span>FRONTEND</span><h3>{understanding.plan.frontend}</h3></div>
+                      <div className="plan-card"><span>BACKEND</span><h3>{understanding.plan.backend}</h3></div>
+                      <div className="plan-card"><span>DATA</span><h3>{understanding.plan.data}</h3></div>
+                    </div>
 
-                          <Check size={14} />
+                    <PlanList title="SCREENS" items={understanding.plan.screens} />
+                    <PlanList title="ARCHITECTURE" items={understanding.plan.architecture} />
+                    <PlanList title="API / DATA CONTRACT" items={understanding.plan.apiEndpoints} />
 
-                          {feature}
+                    <div className="continue-row">
+                      <div><span className="section-label">NEXT STEP</span><p>Use this blueprint as the source of truth for the prototype build.</p></div>
+                      <button className="start-button" onClick={() => setActiveStage('build')}>Continue to Build <ArrowRight size={17} /></button>
+                    </div>
+                  </>
+                )}
 
+                {activeStage === 'build' && confirmed && (
+                  <>
+                    {!isBuilding && !prototypeReady && (
+                      <>
+                        <div className="ai-panel">
+                          <div className="ai-panel-icon"><Hammer size={20} /></div>
+                          <div>
+                            <span className="section-label">AI BUILD ENGINE</span>
+                            <h2>Turn the blueprint into a prototype.</h2>
+                            <p>The current prototype simulates the build pipeline using the AI-approved requirements and plan.</p>
+                          </div>
                         </div>
 
-                      ))}
-
-                    </div>
-
-
-
-                    <button className="generate-button" onClick={generatePrototype}>
-
-                      <Sparkles size={17} />
-
-                      Generate Prototype
-
-                      <ArrowRight size={17} />
-
-                    </button>
-
-                  </div>
-
-                </>
-
-              )}
-
-
-
-              {isBuilding && (
-
-                <div className="build-progress">
-
-                  <div className="build-spinner"><Sparkles size={21} /></div>
-
-                  <span className="section-label">AI BUILD ENGINE</span>
-
-                  <h2>Building {understanding.appName}...</h2>
-
-                  <p>Turning your blueprint into a working prototype.</p>
-
-                  <div className="build-steps">
-
-                    <div className="build-step done"><Check size={14} /> Analyzing requirements</div>
-
-                    <div className="build-step done"><Check size={14} /> Designing app structure</div>
-
-                    <div className="build-step active"><span className="mini-loader"></span> Generating components</div>
-
-                    <div className="build-step"><span className="step-circle"></span> Preparing preview</div>
-
-                  </div>
-
-                </div>
-
-              )}
-
-
-
-              {prototypeReady && !previewOpen && (
-
-                <div className="prototype-ready">
-
-                  <div className="ready-icon"><Check size={25} /></div>
-
-                  <span className="section-label">PROTOTYPE READY</span>
-
-                  <h2>{understanding.appName} is ready.</h2>
-
-                  <p>Your first application prototype has been generated from the approved blueprint.</p>
-
-                  <div className="ready-actions">
-
-                    <button className="generate-button" onClick={() => setPreviewOpen(true)}>
-
-                      Open Preview <ArrowRight size={17} />
-
-                    </button>
-
-                    <button className="change-button" onClick={() => setPrototypeReady(false)}>
-
-                      Regenerate
-
-                    </button>
-
-                  </div>
-
-                </div>
-
-              )}
-
-
-
-              {prototypeReady && previewOpen && (
-
-                <div className="app-preview">
-
-                  <div className="preview-topbar">
-
-                    <div>
-
-                      <span className="preview-logo">✦</span>
-
-                      <strong>{understanding.appName}</strong>
-
-                    </div>
-
-                    <button className="change-button" onClick={() => setPreviewOpen(false)}>
-
-                      Close preview
-
-                    </button>
-
-                  </div>
-
-                  <div className="preview-body">
-
-                    <div className="preview-welcome">
-
-                      <span>WELCOME</span>
-
-                      <h2>Discover your next<br />favorite experience.</h2>
-
-                      <p>A prototype generated from your app idea and development blueprint.</p>
-
-                    </div>
-
-                    <div className="preview-cards">
-
-                      {understanding.features.map((feature, index) => (
-
-                        <div className="preview-card" key={feature}>
-
-                          <div className="preview-card-icon">{index + 1}</div>
-
-                          <h3>{feature}</h3>
-
-                          <p>Explore this feature in your generated application.</p>
-
-                          <button>Explore <ArrowRight size={13} /></button>
-
+                        <div className="build-summary">
+                          <div className="build-summary-header">
+                            <div><span className="section-label">PROJECT BLUEPRINT</span><h3>{understanding.appName}</h3></div>
+                            <span className="platform-pill">{understanding.platform}</span>
+                          </div>
+                          <div className="theme-picker">
+                            <div className="theme-picker-heading">
+                              <div>
+                                <span className="section-label">CUSTOMIZE YOUR WEBSITE</span>
+                                <h3>Choose a visual theme</h3>
+                              </div>
+                              <div className="theme-picker-icon"><Palette size={16} /></div>
+                            </div>
+                            <p className="theme-picker-description">
+                              Your generated website has its own visual identity. Pick a theme before the build starts.
+                            </p>
+                            <div className="theme-options">
+                              {prototypeThemes.map((theme) => (
+                                <button
+                                  key={theme.id}
+                                  type="button"
+                                  className={`theme-option ${selectedTheme === theme.id ? 'selected' : ''}`}
+                                  onClick={() => setSelectedTheme(theme.id)}
+                                >
+                                  <span className={`theme-swatch ${theme.swatchClass}`} />
+                                  <span className="theme-option-copy">
+                                    <strong>{theme.name}</strong>
+                                    <small>{theme.description}</small>
+                                  </span>
+                                  <span className="theme-check">{selectedTheme === theme.id ? <Check size={13} /> : null}</span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="build-feature-list">
+                            {understanding.features.map((feature, index) => (
+                              <div className="build-feature" key={feature}><span>0{index + 1}</span><Check size={14} />{feature}</div>
+                            ))}
+                          </div>
+                          <button className="generate-button" onClick={generatePrototype}><Sparkles size={17} /> Generate Prototype <ArrowRight size={17} /></button>
                         </div>
+                      </>
+                    )}
 
-                      ))}
+                    {isBuilding && (
+                      <div className="build-progress">
+                        <div className="build-spinner"><Sparkles size={21} /></div>
+                        <span className="section-label">AI BUILD ENGINE</span>
+                        <h2>Building {understanding.appName}...</h2>
+                        <p>Turning the AI-generated blueprint into a working prototype experience.</p>
+                        <div className="build-steps">
+                          <div className="build-step done"><Check size={14} /> Analyzing requirements</div>
+                          <div className="build-step done"><Check size={14} /> Applying development plan</div>
+                          <div className="build-step active"><span className="mini-loader" /> Generating components</div>
+                          <div className="build-step"><span className="step-circle" /> Preparing preview</div>
+                        </div>
+                      </div>
+                    )}
 
+                    {prototypeReady && !previewOpen && (
+                      <div className="prototype-ready">
+                        <div className="ready-icon"><Check size={25} /></div>
+                        <span className="section-label">PROTOTYPE READY</span>
+                        <h2>{understanding.appName} is ready.</h2>
+                        <p>Your prototype experience has been prepared from the approved AI blueprint.</p>
+                        <div className="ready-actions">
+                          <button className="generate-button" onClick={() => setPreviewOpen(true)}>Open Preview <ArrowRight size={17} /></button>
+                          <button className="change-button" onClick={() => setPrototypeReady(false)}>Regenerate</button>
+                        </div>
+                      </div>
+                    )}
+
+                    {prototypeReady && previewOpen && (
+                      <PrototypeWebsite
+                        appName={understanding.appName}
+                        summary={understanding.summary}
+                        features={understanding.features}
+                        selectedTheme={selectedTheme}
+                        onClose={() => setPreviewOpen(false)}
+                      />
+                    )}
+
+                    {prototypeReady && (
+                      <div className="continue-row">
+                        <div><span className="section-label">NEXT STEP</span><p>Review how the architecture and technical decisions map to the generated experience.</p></div>
+                        <button className="start-button" onClick={() => setActiveStage('explain')}>Continue to Explain <ArrowRight size={17} /></button>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {activeStage === 'explain' && confirmed && (
+                  <>
+                    <div className="ai-panel">
+                      <div className="ai-panel-icon"><Search size={20} /></div>
+                      <div>
+                        <span className="section-label">AI CODE EXPLAINER</span>
+                        <h2>Here's how your app is put together.</h2>
+                        <p>These explanations come from the same AI-generated blueprint, so you can connect product requirements to technical implementation.</p>
+                      </div>
                     </div>
 
-                  </div>
+                    <div className="plan-grid">
+                      <div className="plan-card"><span>FRONTEND</span><h3>{understanding.explain.frontend}</h3></div>
+                      <div className="plan-card"><span>BACKEND</span><h3>{understanding.explain.backend}</h3></div>
+                      <div className="plan-card"><span>DATA</span><h3>{understanding.explain.data}</h3></div>
+                      <div className="plan-card"><span>PLATFORM</span><h3>{understanding.platform}</h3></div>
+                    </div>
 
-                </div>
+                    <PlanList title="KEY COMPONENTS" items={understanding.explain.components} />
+                    <PlanList title="TECHNICAL DECISIONS" items={understanding.explain.technicalDecisions} />
 
-              )}
+                    <div className="question-card">
+                      <span className="question-number">ARCHITECTURE</span>
+                      <h3>The full journey</h3>
+                      <div className="blueprint-list">
+                        {[
+                          ['01', 'User idea', 'Natural-language product request.'],
+                          ['02', 'Understand', 'Gemini structures users, problem, goal and features.'],
+                          ['03', 'Plan', 'Gemini creates screens, architecture and API/data contracts.'],
+                          ['04', 'Build', 'The approved blueprint drives the prototype build experience.'],
+                          ['05', 'Explain', 'The generated architecture and decisions are made understandable.'],
+                          ['06', 'Learn', 'The project becomes a guided environment for future changes.'],
+                        ].map(([number, title, description]) => (
+                          <div className="blueprint-item" key={number}><span>{number}</span><div><strong>{title}</strong><p>{description}</p></div></div>
+                        ))}
+                      </div>
+                    </div>
 
-            </div>
+                    <div className="continue-row">
+                      <div><span className="section-label">NEXT STEP</span><p>Learn what to change first and how to grow {understanding.appName} beyond the prototype.</p></div>
+                      <button className="start-button" onClick={() => setActiveStage('learn')}>Continue to Learn <ArrowRight size={17} /></button>
+                    </div>
+                  </>
+                )}
 
-          )}
+                {activeStage === 'learn' && confirmed && (
+                  <>
+                    <div className="ai-panel">
+                      <div className="ai-panel-icon"><GraduationCap size={20} /></div>
+                      <div>
+                        <span className="section-label">AI LEARNING GUIDE</span>
+                        <h2>Learn by changing the app.</h2>
+                        <p>Your learning path is generated from {understanding.appName}'s actual plan, features and architecture.</p>
+                      </div>
+                    </div>
 
+                    <PlanList title="YOUR LEARNING PATH" items={understanding.learn.path} />
+                    <PlanList title="PROJECT EXERCISES" items={understanding.learn.exercises} />
 
+                    <div className="question-card">
+                      <span className="question-number">TRY IT YOURSELF</span>
+                      <h3>Start with one small change</h3>
+                      <p>Pick an exercise, make the change in the project, run it again and compare the result with the original blueprint.</p>
+                      <div className="feature-list">
+                        {understanding.learn.exercises.map((item) => (
+                          <div className="feature-item" key={item.name}><span className="feature-check"><Check size={13} /></span><div><strong>{item.name}</strong><p>{item.purpose}</p></div></div>
+                        ))}
+                      </div>
+                    </div>
 
-          {/* EXPLAIN */}
-
-          {started && activeStage === 'explain' && confirmed && understanding && (
-            <div className="working-area">
-              <div className="working-header">
-                <div>
-                  <span className="section-label">04 · EXPLAIN</span>
-                  <h1>Understand what AI built.</h1>
-                  <p>Explore the architecture, data flow and technical decisions behind your application.</p>
-                </div>
-                {prototypeReady && (
-                  <button className="change-button" onClick={() => setActiveStage('build')}>
-                    Back to preview
-                  </button>
+                    <div className="continue-row">
+                      <div><span className="section-label">JOURNEY COMPLETE</span><p>You went from an idea to requirements, planning, building, explanation and app-specific learning.</p></div>
+                      <button className="start-button" onClick={() => setActiveStage('build')}>Back to App <ArrowRight size={17} /></button>
+                    </div>
+                  </>
                 )}
               </div>
-
-              <div className="progress-line">
-                {stages.map((stage, index) => {
-                  const Icon = stage.icon
-                  return (
-                    <button
-                      key={stage.id}
-                      className={`progress-stage ${activeStage === stage.id ? 'current' : ''}`}
-                      onClick={() => setActiveStage(stage.id)}
-                    >
-                      <span><Icon size={16} /></span>
-                      <div>
-                        <small>0{index + 1}</small>
-                        <strong>{stage.label}</strong>
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
-
-              <div className="ai-panel">
-                <div className="ai-panel-icon">
-                  <Search size={20} />
-                </div>
-                <div>
-                  <span className="section-label">AI CODE EXPLAINER</span>
-                  <h2>Here's how your app is put together.</h2>
-                  <p>
-                    The prototype follows a simple layered structure so you can understand
-                    what each part does and where to make changes.
-                  </p>
-                </div>
-              </div>
-
-              <div className="plan-grid">
-                <div className="plan-card">
-                  <span>FRONTEND</span>
-                  <h3>React + TypeScript</h3>
-                  <p>Reusable UI components handle screens, interactions and application state.</p>
-                </div>
-
-                <div className="plan-card">
-                  <span>BACKEND</span>
-                  <h3>API + AI services</h3>
-                  <p>Application logic and AI capabilities can be exposed through backend services.</p>
-                </div>
-
-                <div className="plan-card">
-                  <span>DATA</span>
-                  <h3>Structured application data</h3>
-                  <p>Requirements, features and generated app information are kept in predictable structures.</p>
-                </div>
-
-                <div className="plan-card">
-                  <span>PLATFORM</span>
-                  <h3>{understanding.platform}</h3>
-                  <p>The selected platform guides the UI and technical implementation.</p>
-                </div>
-              </div>
-
-              <div className="question-card">
-                <span className="question-number">ARCHITECTURE</span>
-                <h3>From your idea to the running prototype</h3>
-
-                <div className="blueprint-list">
-                  {[
-                    ['01', 'User idea', 'Your natural-language prompt describes the product you want to build.'],
-                    ['02', 'Understanding', 'AI converts the idea into users, problem, goal and core features.'],
-                    ['03', 'Plan', 'The requirements become a technical blueprint for the application.'],
-                    ['04', 'Build', 'The approved blueprint is turned into the first working prototype.'],
-                    ['05', 'Preview', 'You can inspect the generated experience before extending it.'],
-                  ].map(([number, title, description]) => (
-                    <div className="blueprint-item" key={number}>
-                      <span>{number}</span>
-                      <div>
-                        <strong>{title}</strong>
-                        <p>{description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="question-card">
-                <span className="question-number">KEY COMPONENTS</span>
-                <h3>What each part is responsible for</h3>
-
-                <div className="feature-list">
-                  {[
-                    ['App shell', 'Controls the overall workspace, navigation and project state.'],
-                    ['Understanding layer', 'Turns the original prompt into a structured product definition.'],
-                    ['Planning layer', 'Organizes features, platform and technical structure.'],
-                    ['Build layer', 'Uses the approved plan to prepare the prototype experience.'],
-                    ['Preview layer', 'Presents the generated app so you can review the result.'],
-                  ].map(([title, description]) => (
-                    <div className="feature-item" key={title}>
-                      <span className="feature-check"><Check size={13} /></span>
-                      <div>
-                        <strong>{title}</strong>
-                        <p>{description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="question-card">
-                <span className="question-number">WHY THIS ARCHITECTURE?</span>
-                <h3>Technical decisions explained</h3>
-
-                <div className="feature-list">
-                  <div className="feature-item">
-                    <span className="feature-check"><Check size={13} /></span>
-                    <div>
-                      <strong>React + TypeScript</strong>
-                      <p>Component-based UI makes individual screens easier to reuse and modify, while TypeScript adds clearer structure to application data.</p>
-                    </div>
-                  </div>
-
-                  <div className="feature-item">
-                    <span className="feature-check"><Check size={13} /></span>
-                    <div>
-                      <strong>Layered workflow</strong>
-                      <p>Separating Understand, Plan and Build makes the generation process inspectable instead of hiding everything behind one prompt.</p>
-                    </div>
-                  </div>
-
-                  <div className="feature-item">
-                    <span className="feature-check"><Check size={13} /></span>
-                    <div>
-                      <strong>Structured requirements</strong>
-                      <p>Keeping users, goals and features in predictable fields makes the next stages easier to reason about and eventually connect to an LLM.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="question-card">
-                <span className="question-number">HOW TO MODIFY IT</span>
-                <h3>Make the app your own</h3>
-
-                <div className="blueprint-list">
-                  {[
-                    ['01', 'Add a feature', 'Update the product requirements and blueprint, then regenerate the affected experience.'],
-                    ['02', 'Change the UI', 'Find the relevant React component and adjust its layout, content or styling.'],
-                    ['03', 'Add an API', 'Create a backend endpoint or service and connect the frontend to it.'],
-                    ['04', 'Change the data', 'Update the structured application data and make the UI consume the new fields.'],
-                  ].map(([number, title, description]) => (
-                    <div className="blueprint-item" key={number}>
-                      <span>{number}</span>
-                      <div>
-                        <strong>{title}</strong>
-                        <p>{description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="continue-row">
-                <div>
-                  <span className="section-label">NEXT STEP</span>
-                  <p>Once you understand the architecture, learn how to modify and extend the generated application.</p>
-                </div>
-                <button className="start-button" onClick={() => setActiveStage('learn')}>
-                  Continue to Learn
-                  <ArrowRight size={17} />
-                </button>
-              </div>
-            </div>
+            </>
           )}
-
-          {/* LEARN */}
-
-          {started && activeStage === 'learn' && confirmed && understanding && (
-            <div className="working-area">
-              <div className="working-header">
-                <div>
-                  <span className="section-label">05 · LEARN</span>
-                  <h1>Learn how to extend your app.</h1>
-                  <p>Use the generated project as a starting point and learn how to change it step by step.</p>
-                </div>
-                <button className="change-button" onClick={() => setActiveStage('explain')}>
-                  <Search size={13} />
-                  View explanation
-                </button>
-              </div>
-
-              <div className="progress-line">
-                {stages.map((stage, index) => {
-                  const Icon = stage.icon
-                  return (
-                    <button
-                      key={stage.id}
-                      className={`progress-stage ${activeStage === stage.id ? 'current' : ''}`}
-                      onClick={() => setActiveStage(stage.id)}
-                    >
-                      <span><Icon size={16} /></span>
-                      <div>
-                        <small>0{index + 1}</small>
-                        <strong>{stage.label}</strong>
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
-
-              <div className="ai-panel">
-                <div className="ai-panel-icon">
-                  <GraduationCap size={20} />
-                </div>
-                <div>
-                  <span className="section-label">AI LEARNING GUIDE</span>
-                  <h2>Learn by changing the app.</h2>
-                  <p>
-                    Instead of stopping after generation, this stage shows you what to learn
-                    next and how each change connects to the application you just built.
-                  </p>
-                </div>
-              </div>
-
-              <div className="question-card">
-                <span className="question-number">YOUR LEARNING PATH</span>
-                <h3>From small edits to real features</h3>
-
-                <div className="blueprint-list">
-                  {[
-                    ['01', 'Understand the structure', 'Identify the main components, state and data flow before making changes.'],
-                    ['02', 'Change the interface', 'Modify text, spacing, cards, buttons and layouts in the React UI.'],
-                    ['03', 'Add a feature', 'Turn a new product requirement into a component and application workflow.'],
-                    ['04', 'Connect an API', 'Learn how frontend components communicate with backend services and data.'],
-                    ['05', 'Extend and deploy', 'Test the application, improve it and prepare it for real users.'],
-                  ].map(([number, title, description]) => (
-                    <div className="blueprint-item" key={number}>
-                      <span>{number}</span>
-                      <div>
-                        <strong>{title}</strong>
-                        <p>{description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="plan-grid">
-                <div className="plan-card">
-                  <span>PROJECT</span>
-                  <h3>{understanding.appName}</h3>
-                  <p>Use your generated prototype as the practical learning environment.</p>
-                </div>
-
-                <div className="plan-card">
-                  <span>FIRST EXERCISE</span>
-                  <h3>Change one UI element</h3>
-                  <p>Start with a small visual change so you can see the edit → run → review cycle.</p>
-                </div>
-
-                <div className="plan-card">
-                  <span>NEXT EXERCISE</span>
-                  <h3>Add a new feature</h3>
-                  <p>Take one requirement and turn it into a new component or workflow.</p>
-                </div>
-
-                <div className="plan-card">
-                  <span>ADVANCED</span>
-                  <h3>Connect real data</h3>
-                  <p>Replace prototype data with an API or database when the app is ready.</p>
-                </div>
-              </div>
-
-              <div className="question-card">
-                <span className="question-number">TRY IT YOURSELF</span>
-                <h3>What would you change first?</h3>
-                <p>
-                  Pick one small improvement to your {understanding.appName} prototype.
-                  A good first task is adding a feature, changing a screen, or connecting
-                  a real data source.
-                </p>
-
-                <div className="feature-list">
-                  {[
-                    'Add a new feature to the current app',
-                    'Redesign one screen or component',
-                    'Connect a backend API',
-                    'Replace prototype data with real data',
-                  ].map((item) => (
-                    <div className="feature-item" key={item}>
-                      <span className="feature-check"><Check size={13} /></span>
-                      {item}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="continue-row">
-                <div>
-                  <span className="section-label">JOURNEY COMPLETE</span>
-                  <p>You have gone from an idea to requirements, planning, building, explanation and learning.</p>
-                </div>
-                <button className="start-button" onClick={() => setActiveStage('build')}>
-                  Back to App
-                  <ArrowRight size={17} />
-                </button>
-              </div>
-            </div>
-          )}
-</section>
-
-
-
+        </section>
       </main>
-
-
-
     </div>
-
-
-
   )
-
-
-
 }
 
 
+type PrototypeWebsiteProps = {
+  appName: string
+  summary: string
+  features: string[]
+  selectedTheme: ThemeId
+  onClose: () => void
+}
 
+type PrototypeProfile = {
+  category: 'fitness' | 'books' | 'food' | 'travel' | 'finance' | 'education' | 'shopping' | 'music' | 'generic'
+  kicker: string
+  nav: string[]
+  primaryCta: string
+  secondaryCta: string
+  sectionLabel: string
+  sectionTitle: string
+  searchPlaceholder: string
+  heroTag: string
+  heroHeadline: string
+  heroSubline: string
+  visualIcon: typeof Dumbbell
+  visualLabel: string
+  visualTitle: string
+  visualMeta: string
+  metricLabels: string[]
+}
 
+function getPrototypeProfile(appName: string, summary: string, features: string[]): PrototypeProfile {
+  const text = `${appName} ${summary} ${features.join(' ')}`.toLowerCase()
 
+  if (/fitness|workout|gym|exercise|health|running|training|calorie/.test(text)) {
+    return {
+      category: 'fitness',
+      kicker: 'FITNESS & WELLNESS',
+      nav: ['Dashboard', 'Workouts', 'Progress'],
+      primaryCta: 'Start workout',
+      secondaryCta: 'View progress',
+      sectionLabel: 'YOUR TRAINING SPACE',
+      sectionTitle: 'Build momentum, one session at a time.',
+      searchPlaceholder: 'Search workouts, exercises...',
+      heroTag: 'TODAY\'S FOCUS',
+      heroHeadline: 'Train smarter.',
+      heroSubline: 'Track sessions, build routines and turn daily movement into measurable progress.',
+      visualIcon: Dumbbell,
+      visualLabel: 'TODAY',
+      visualTitle: 'Full Body Strength',
+      visualMeta: '42 min · 6 exercises',
+      metricLabels: ['Weekly goal', 'Workouts', 'Calories'],
+    }
+  }
 
+  if (/book|textbook|library|read|novel|course material|literature/.test(text)) {
+    return {
+      category: 'books',
+      kicker: 'BOOKS & LEARNING',
+      nav: ['Discover', 'Collections', 'My shelf'],
+      primaryCta: 'Explore books',
+      secondaryCta: 'My reading list',
+      sectionLabel: 'DISCOVER SOMETHING NEW',
+      sectionTitle: 'Find your next great read.',
+      searchPlaceholder: 'Search books, authors, subjects...',
+      heroTag: 'FEATURED COLLECTION',
+      heroHeadline: 'Read more. Learn more.',
+      heroSubline: 'Discover useful titles, organize your shelf and find the right book for what you are learning.',
+      visualIcon: BookOpen,
+      visualLabel: 'FEATURED',
+      visualTitle: 'The Knowledge Shelf',
+      visualMeta: '24 titles · Curated for you',
+      metricLabels: ['Books saved', 'In progress', 'Completed'],
+    }
+  }
+
+  if (/food|recipe|restaurant|meal|cook|nutrition|diet/.test(text)) {
+    return {
+      category: 'food',
+      kicker: 'FOOD & RECIPES',
+      nav: ['Discover', 'Recipes', 'Favorites'],
+      primaryCta: 'Find a recipe',
+      secondaryCta: 'Plan a meal',
+      sectionLabel: 'WHAT ARE YOU CRAVING?',
+      sectionTitle: 'Good food starts with a good idea.',
+      searchPlaceholder: 'Search recipes, ingredients...',
+      heroTag: 'TODAY\'S PICK',
+      heroHeadline: 'Cook something memorable.',
+      heroSubline: 'Discover recipes, save favorites and turn everyday ingredients into meals you will love.',
+      visualIcon: Utensils,
+      visualLabel: 'POPULAR',
+      visualTitle: 'Fresh & Simple',
+      visualMeta: '30 min · Easy',
+      metricLabels: ['Saved recipes', 'Meals planned', 'Favorites'],
+    }
+  }
+
+  if (/travel|trip|tour|flight|hotel|destination|vacation/.test(text)) {
+    return {
+      category: 'travel',
+      kicker: 'TRAVEL & DISCOVERY',
+      nav: ['Explore', 'Trips', 'Saved places'],
+      primaryCta: 'Explore places',
+      secondaryCta: 'Plan a trip',
+      sectionLabel: 'EXPLORE THE WORLD',
+      sectionTitle: 'Your next adventure starts here.',
+      searchPlaceholder: 'Search places, cities, experiences...',
+      heroTag: 'WEEKEND ESCAPE',
+      heroHeadline: 'Go somewhere new.',
+      heroSubline: 'Discover places, save ideas and turn inspiration into a trip that is easy to plan.',
+      visualIcon: Plane,
+      visualLabel: 'NEXT TRIP',
+      visualTitle: 'Coastal Escape',
+      visualMeta: '3 days · 12 saved places',
+      metricLabels: ['Places saved', 'Trips planned', 'Memories'],
+    }
+  }
+
+  if (/finance|money|budget|expense|bank|investment|saving|payment/.test(text)) {
+    return {
+      category: 'finance',
+      kicker: 'MONEY & FINANCE',
+      nav: ['Overview', 'Transactions', 'Goals'],
+      primaryCta: 'Add transaction',
+      secondaryCta: 'View insights',
+      sectionLabel: 'FINANCIAL OVERVIEW',
+      sectionTitle: 'Make every decision with clarity.',
+      searchPlaceholder: 'Search transactions...',
+      heroTag: 'THIS MONTH',
+      heroHeadline: 'Your money, at a glance.',
+      heroSubline: 'Track spending, understand patterns and stay focused on the financial goals that matter.',
+      visualIcon: WalletCards,
+      visualLabel: 'BALANCE',
+      visualTitle: 'Monthly Overview',
+      visualMeta: 'On track · 4 goals active',
+      metricLabels: ['Balance', 'Saved', 'Spent'],
+    }
+  }
+
+  if (/student|education|course|learning|study|college|school|class|academic/.test(text)) {
+    return {
+      category: 'education',
+      kicker: 'LEARNING PLATFORM',
+      nav: ['Dashboard', 'Courses', 'Progress'],
+      primaryCta: 'Continue learning',
+      secondaryCta: 'Explore courses',
+      sectionLabel: 'YOUR LEARNING SPACE',
+      sectionTitle: 'Turn small study sessions into progress.',
+      searchPlaceholder: 'Search courses, topics...',
+      heroTag: 'CONTINUE LEARNING',
+      heroHeadline: 'Keep moving forward.',
+      heroSubline: 'Organize learning, track progress and make every study session count.',
+      visualIcon: GraduationCapIcon,
+      visualLabel: 'IN PROGRESS',
+      visualTitle: 'Current Course',
+      visualMeta: '68% complete · 4 lessons left',
+      metricLabels: ['Courses', 'Study hours', 'Progress'],
+    }
+  }
+
+  if (/shop|store|product|marketplace|sell|buy|commerce/.test(text)) {
+    return {
+      category: 'shopping',
+      kicker: 'SHOPPING EXPERIENCE',
+      nav: ['Discover', 'Collections', 'Cart'],
+      primaryCta: 'Start shopping',
+      secondaryCta: 'View collection',
+      sectionLabel: 'CURATED FOR YOU',
+      sectionTitle: 'Discover things worth adding to your world.',
+      searchPlaceholder: 'Search products, collections...',
+      heroTag: 'FEATURED DROP',
+      heroHeadline: 'Find your next favorite.',
+      heroSubline: 'Browse products, save what you love and make shopping feel simple and personal.',
+      visualIcon: ShoppingBag,
+      visualLabel: 'FEATURED',
+      visualTitle: 'Editor\'s Picks',
+      visualMeta: '12 items · Updated today',
+      metricLabels: ['Saved items', 'Orders', 'Collections'],
+    }
+  }
+
+  if (/music|song|playlist|audio|podcast/.test(text)) {
+    return {
+      category: 'music',
+      kicker: 'MUSIC & AUDIO',
+      nav: ['Home', 'Library', 'Playlists'],
+      primaryCta: 'Start listening',
+      secondaryCta: 'Browse library',
+      sectionLabel: 'MADE FOR YOUR MOOD',
+      sectionTitle: 'Find something worth pressing play on.',
+      searchPlaceholder: 'Search artists, songs, playlists...',
+      heroTag: 'NOW PLAYING',
+      heroHeadline: 'Your sound, your space.',
+      heroSubline: 'Discover tracks, organize playlists and keep your favorite audio close.',
+      visualIcon: Music,
+      visualLabel: 'PLAYING NOW',
+      visualTitle: 'Focus Session',
+      visualMeta: '42 tracks · 2h 18m',
+      metricLabels: ['Playlists', 'Favorites', 'Minutes'],
+    }
+  }
+
+  return {
+    category: 'generic',
+    kicker: 'YOUR NEW PRODUCT',
+    nav: ['Overview', 'Explore', 'Workspace'],
+    primaryCta: 'Get started',
+    secondaryCta: 'Explore features',
+    sectionLabel: 'BUILT AROUND YOUR IDEA',
+    sectionTitle: 'A focused experience made for your users.',
+    searchPlaceholder: `Search ${appName.toLowerCase()}...`,
+    heroTag: 'FEATURED',
+    heroHeadline: 'Built around your idea.',
+    heroSubline: summary,
+    visualIcon: BriefcaseBusiness,
+    visualLabel: 'PRODUCT',
+    visualTitle: appName,
+    visualMeta: 'Designed from your AI blueprint',
+    metricLabels: ['Features', 'Workflows', 'Users'],
+  }
+}
+
+function PrototypeWebsite({ appName, summary, features, selectedTheme, onClose }: PrototypeWebsiteProps) {
+  const profile = getPrototypeProfile(appName, summary, features)
+  const VisualIcon = profile.visualIcon
+  const featureIcons = profile.category === 'fitness'
+    ? [Dumbbell, HeartPulse, CalendarDays, Star, Camera]
+    : profile.category === 'books' || profile.category === 'education'
+      ? [BookOpen, GraduationCapIcon, Star, CalendarDays, MapPin]
+      : profile.category === 'food'
+        ? [Utensils, HeartPulse, Star, CalendarDays, Camera]
+        : profile.category === 'travel'
+          ? [Plane, MapPin, Camera, CalendarDays, Star]
+          : profile.category === 'finance'
+            ? [WalletCards, BriefcaseBusiness, CalendarDays, Star, HeartPulse]
+            : profile.category === 'shopping'
+              ? [ShoppingBag, Star, Camera, WalletCards, MapPin]
+              : profile.category === 'music'
+                ? [Music, Star, Camera, CalendarDays, HeartPulse]
+                : [BriefcaseBusiness, Star, CalendarDays, MapPin, Camera]
+
+  return (
+    <div className={`app-preview theme-${selectedTheme}`}>
+      <div className="preview-topbar">
+        <div className="preview-brand">
+          <span className="preview-logo"><VisualIcon size={15} /></span>
+          <strong>{appName}</strong>
+        </div>
+        <nav className="preview-nav">
+          {profile.nav.map((item) => <span key={item}>{item}</span>)}
+        </nav>
+        <button className="preview-close" onClick={onClose}>Close preview</button>
+      </div>
+
+      <div className={`preview-site preview-category-${profile.category}`}>
+        <section className="preview-hero">
+          <div className="preview-hero-copy">
+            <span className="preview-kicker">{profile.kicker}</span>
+            <h2>{profile.heroHeadline}</h2>
+            <p>{profile.heroSubline}</p>
+            <div className="preview-actions">
+              <button className="preview-primary">{profile.primaryCta} <ArrowRight size={15} /></button>
+              <button className="preview-secondary">{profile.secondaryCta}</button>
+            </div>
+          </div>
+
+          <div className="preview-hero-art">
+            <div className="hero-art-card">
+              <span>{profile.heroTag}</span>
+              <VisualIcon size={30} className="hero-topic-icon" />
+              <strong>{profile.visualTitle}</strong>
+              <small>{profile.visualMeta}</small>
+              <div className="hero-progress"><span /></div>
+            </div>
+            <div className="hero-orbit one" />
+            <div className="hero-orbit two" />
+          </div>
+        </section>
+
+        <section className="preview-toolbar">
+          <div>
+            <span>{profile.sectionLabel}</span>
+            <strong>{profile.sectionTitle}</strong>
+          </div>
+          <div className="preview-search">⌕ {profile.searchPlaceholder}</div>
+        </section>
+
+        <section className="preview-topic-showcase">
+          <div className="topic-feature-visual">
+            <div className="topic-visual-glow" />
+            <VisualIcon size={48} />
+            <span>{profile.visualLabel}</span>
+            <strong>{profile.visualTitle}</strong>
+            <small>{profile.visualMeta}</small>
+          </div>
+
+          <div className="topic-metrics">
+            {profile.metricLabels.map((label, index) => (
+              <div className="topic-metric" key={label}>
+                <span>0{index + 1}</span>
+                <strong>{index === 0 ? (profile.category === 'fitness' ? '4' : profile.category === 'books' ? '24' : profile.category === 'travel' ? '12' : '18') : index === 1 ? '68%' : '92%'}</strong>
+                <small>{label}</small>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="preview-real-content">
+          <div className="real-content-heading">
+            <div>
+              <span>{profile.sectionLabel}</span>
+              <h3>{profile.sectionTitle}</h3>
+            </div>
+            <button className="preview-secondary">View all <ArrowRight size={14} /></button>
+          </div>
+
+          <div className="real-content-layout">
+            <article className="real-feature">
+              <div className="real-feature-art">
+                <div className="real-art-orb orb-a" />
+                <div className="real-art-orb orb-b" />
+                <VisualIcon size={58} />
+                <span>{profile.heroTag}</span>
+              </div>
+              <div className="real-feature-copy">
+                <span>01 · FEATURED</span>
+                <h4>{features[0] || profile.visualTitle}</h4>
+                <p>{profile.heroSubline}</p>
+                <button>{profile.primaryCta} <ArrowRight size={14} /></button>
+              </div>
+            </article>
+
+            <div className="real-feature-list">
+              {features.slice(1).map((feature, index) => {
+                const FeatureIcon = featureIcons[(index + 1) % featureIcons.length]
+                return (
+                  <article className="real-list-item" key={feature}>
+                    <div className="real-list-icon"><FeatureIcon size={19} /></div>
+                    <div className="real-list-copy">
+                      <span>0{index + 2} · {profile.category.toUpperCase()}</span>
+                      <h4>{feature}</h4>
+                      <p>Designed as part of the {appName} experience.</p>
+                    </div>
+                    <ArrowRight size={15} className="real-list-arrow" />
+                  </article>
+                )
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className="preview-experience-strip">
+          <div className="experience-copy">
+            <span>{profile.kicker}</span>
+            <h3>A complete experience built around your idea.</h3>
+            <p>{summary}</p>
+          </div>
+          <div className="experience-actions">
+            <div className="experience-chip"><Check size={13} /> Personalized</div>
+            <div className="experience-chip"><Check size={13} /> Responsive</div>
+            <div className="experience-chip"><Check size={13} /> Ready to extend</div>
+          </div>
+        </section>
+        <section className="preview-cta">
+          <div>
+            <span>{profile.kicker}</span>
+            <h3>Everything is ready for your first real workflow.</h3>
+          </div>
+          <button className="preview-primary">{profile.primaryCta} <ArrowRight size={15} /></button>
+        </section>
+
+        <footer className="preview-footer">
+          <span><VisualIcon size={13} /> {appName}</span>
+          <span>Prototype generated from the approved product blueprint</span>
+        </footer>
+      </div>
+    </div>
+  )
+}
+
+function PlanList({ title, items }: { title: string; items: Item[] }) {
+  return (
+    <div className="question-card">
+      <span className="question-number">{title}</span>
+      <div className="blueprint-list">
+        {items.map((item, index) => (
+          <div className="blueprint-item" key={item.name}>
+            <span>0{index + 1}</span>
+            <div><strong>{item.name}</strong><p>{item.purpose}</p></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 export default App
