@@ -2332,3 +2332,162 @@ body::before {
     font-size: clamp(62px, 5.2vw, 88px);
   }
 }
+
+
+/* =========================================================
+   SMOKY PREMIUM BACKGROUND + DARK NAVIGATION
+   UI-only refinement.
+   ========================================================= */
+
+body {
+  background:
+    radial-gradient(ellipse 70% 45% at 58% 8%, rgba(255, 105, 145, .16), transparent 62%),
+    radial-gradient(ellipse 55% 42% at 82% 58%, rgba(147, 108, 255, .12), transparent 64%),
+    radial-gradient(ellipse 48% 38% at 32% 82%, rgba(95, 135, 190, .09), transparent 65%),
+    linear-gradient(135deg, #f7f5f4 0%, #fbf8fa 42%, #f5f2f7 100%);
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: -15%;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 20% 25%, rgba(255,255,255,.72), transparent 22%),
+    radial-gradient(circle at 75% 20%, rgba(255,214,225,.26), transparent 24%),
+    radial-gradient(circle at 58% 78%, rgba(215,202,255,.20), transparent 26%);
+  filter: blur(70px);
+  opacity: .85;
+}
+
+.app-shell {
+  position: relative;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse 75% 55% at 58% 0%, rgba(255,255,255,.72), transparent 68%),
+    transparent;
+}
+
+/* Dark premium sidebar for stronger navigation contrast */
+.sidebar {
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,95,133,.08), transparent 30%),
+    linear-gradient(180deg, #111014 0%, #0d0c0f 100%);
+  border-right: 1px solid rgba(255,255,255,.08);
+  box-shadow: 14px 0 45px rgba(20,12,20,.13);
+  color: #f4f0f4;
+}
+
+.brand-name {
+  color: #fff;
+}
+
+.brand-caption {
+  color: #8e8791;
+}
+
+.workspace-label,
+.section-label {
+  color: #77717b;
+}
+
+.new-project {
+  color: #eee8ef;
+  border-color: rgba(255,255,255,.11);
+  background: linear-gradient(135deg, rgba(255,255,255,.065), rgba(255,95,133,.055));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.new-project:hover {
+  color: #fff;
+  border-color: rgba(255,105,145,.32);
+  background: linear-gradient(135deg, rgba(255,105,145,.11), rgba(166,112,255,.08));
+}
+
+.stage-nav {
+  gap: 8px;
+}
+
+.stage-item {
+  color: #a29aa5;
+  border: 1px solid transparent;
+}
+
+.stage-item:hover {
+  color: #fff;
+  background: rgba(255,255,255,.055);
+}
+
+.stage-item.active {
+  color: #fff;
+  border-color: rgba(255,105,145,.24);
+  background:
+    linear-gradient(90deg, rgba(255,95,133,.15), rgba(155,108,255,.08)),
+    rgba(255,255,255,.035);
+  box-shadow:
+    inset 3px 0 0 #ff6488,
+    0 8px 24px rgba(0,0,0,.18);
+}
+
+.stage-item.active svg {
+  color: #ff82a0;
+}
+
+.stage-item svg {
+  color: #8e8792;
+}
+
+.sidebar-bottom {
+  color: #89818c;
+}
+
+.main-content {
+  position: relative;
+  z-index: 1;
+}
+
+.topbar {
+  background: rgba(250,248,249,.68);
+  border-bottom-color: rgba(32,25,34,.075);
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-section h1 {
+  text-shadow: 0 2px 35px rgba(120,90,120,.06);
+}
+
+.prompt-card,
+.journey-grid,
+.question-card,
+.understanding-card,
+.plan-card,
+.build-summary,
+.blueprint-list,
+.continue-row {
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.prompt-card {
+  background:
+    radial-gradient(circle at 95% 0%, rgba(255,95,133,.10), transparent 28%),
+    rgba(255,255,255,.78);
+}
+
+.journey-grid {
+  background: rgba(255,255,255,.72);
+}
+
+.journey-card {
+  background: rgba(255,255,255,.62);
+}
+
+.journey-card:hover {
+  background:
+    linear-gradient(145deg, rgba(255,247,249,.92), rgba(248,244,255,.92));
+}
