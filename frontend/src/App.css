@@ -2491,3 +2491,60 @@ body::after {
   background:
     linear-gradient(145deg, rgba(255,247,249,.92), rgba(248,244,255,.92));
 }
+
+
+/* Sidebar: keep the light background, strengthen navigation text contrast */
+.sidebar {
+  background: rgba(255,255,255,.92);
+  border-right: 1px solid #e6e1e5;
+  box-shadow: 10px 0 35px rgba(30,22,30,.045);
+  color: #17151a;
+}
+
+.brand-name {
+  color: #17151a;
+}
+
+.brand-caption {
+  color: #8b848d;
+}
+
+.workspace-label,
+.section-label {
+  color: #8b848d;
+}
+
+.new-project {
+  color: #272229;
+  border-color: #e5dfe4;
+  background: linear-gradient(135deg, #ffffff, #fff8fa);
+}
+
+.stage-item {
+  color: #242027;
+  border-color: transparent;
+}
+
+.stage-item:hover {
+  color: #111014;
+  background: #f8f5f7;
+}
+
+.stage-item.active {
+  color: #111014;
+  border-color: rgba(255,95,133,.22);
+  background: linear-gradient(90deg, #fff0f4, #faf6ff);
+  box-shadow: inset 3px 0 0 #ff6488, 0 5px 18px rgba(40,25,40,.035);
+}
+
+.stage-item svg {
+  color: #5d5660;
+}
+
+.stage-item.active svg {
+  color: #e65377;
+}
+
+.sidebar-bottom {
+  color: #777079;
+}
