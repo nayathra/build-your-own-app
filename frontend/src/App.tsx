@@ -425,25 +425,68 @@ function App() {
                     {prototypeReady && previewOpen && (
                       <div className="app-preview">
                         <div className="preview-topbar">
-                          <div><span className="preview-logo">✦</span><strong>{understanding.appName}</strong></div>
-                          <button className="change-button" onClick={() => setPreviewOpen(false)}>Close preview</button>
+                          <div className="preview-brand">
+                            <span className="preview-logo">✦</span>
+                            <strong>{understanding.appName}</strong>
+                          </div>
+                          <nav className="preview-nav">
+                            <span>Discover</span>
+                            <span>How it works</span>
+                            <span>My listings</span>
+                          </nav>
+                          <button className="preview-close" onClick={() => setPreviewOpen(false)}>Close preview</button>
                         </div>
-                        <div className="preview-body">
-                          <div className="preview-welcome">
-                            <span>GENERATED PROTOTYPE</span>
-                            <h2>{understanding.appName}</h2>
-                            <p>{understanding.summary}</p>
-                          </div>
-                          <div className="preview-cards">
-                            {understanding.features.map((feature, index) => (
-                              <div className="preview-card" key={feature}>
-                                <div className="preview-card-icon">{index + 1}</div>
-                                <h3>{feature}</h3>
-                                <p>Prototype entry generated from the approved MVP requirement.</p>
-                                <button>Explore <ArrowRight size={13} /></button>
+
+                        <div className="preview-site">
+                          <section className="preview-hero">
+                            <div className="preview-hero-copy">
+                              <span className="preview-kicker">CAMPUS MARKETPLACE</span>
+                              <h2>{understanding.appName}</h2>
+                              <p>{understanding.summary}</p>
+                              <div className="preview-actions">
+                                <button className="preview-primary">Explore listings <ArrowRight size={15} /></button>
+                                <button className="preview-secondary">Create a listing</button>
                               </div>
+                            </div>
+                            <div className="preview-hero-art">
+                              <div className="hero-art-card"><span>BOOKS</span><strong>Find it. Trade it. Learn.</strong><small>Built for your campus community.</small></div>
+                              <div className="hero-orbit one" />
+                              <div className="hero-orbit two" />
+                            </div>
+                          </section>
+
+                          <section className="preview-toolbar">
+                            <div>
+                              <span>EXPLORE THE MARKETPLACE</span>
+                              <strong>Find what you need for your next class.</strong>
+                            </div>
+                            <div className="preview-search">⌕ Search books, courses, authors...</div>
+                          </section>
+
+                          <section className="preview-cards">
+                            {understanding.features.map((feature, index) => (
+                              <article className="preview-card" key={feature}>
+                                <div className="preview-card-icon">{String(index + 1).padStart(2, '0')}</div>
+                                <div className="preview-card-meta">FEATURE {String(index + 1).padStart(2, '0')}</div>
+                                <h3>{feature}</h3>
+                                <p>Explore this part of the {understanding.appName} experience.</p>
+                                <button>View feature <ArrowRight size={13} /></button>
+                              </article>
                             ))}
-                          </div>
+                          </section>
+
+                          <section className="preview-cta">
+                            <div>
+                              <span>BUILT FOR REAL CAMPUS NEEDS</span>
+                              <h3>Everything you need to get started.</h3>
+                            </div>
+                            <button className="preview-primary">Get started <ArrowRight size={15} /></button>
+                          </section>
+
+                          <footer className="preview-footer">
+                            <span>✦ {understanding.appName}</span>
+                            <span>Generated prototype · AI-assisted development</span>
+                          </footer>
                         </div>
                       </div>
                     )}
