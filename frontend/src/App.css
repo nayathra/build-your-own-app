@@ -2548,3 +2548,148 @@ body::after {
 .sidebar-bottom {
   color: #777079;
 }
+
+
+/* =========================================================
+   FINAL UI POLISH — motion, depth and interaction
+   Visual-only: application logic is untouched.
+   ========================================================= */
+
+@keyframes premium-fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes premium-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes ambient-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(18px, -10px, 0) scale(1.035); }
+}
+
+@keyframes soft-pulse {
+  0%, 100% { opacity: .72; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+@keyframes button-glow {
+  0%, 100% { box-shadow: 0 12px 28px rgba(255,95,133,.18); }
+  50% { box-shadow: 0 16px 38px rgba(255,95,133,.28); }
+}
+
+body::after {
+  animation: ambient-drift 14s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.content {
+  animation: premium-fade-in .45s ease-out both;
+}
+
+.hero-section {
+  animation: premium-fade-up .65s cubic-bezier(.2,.75,.2,1) both;
+}
+
+.eyebrow {
+  animation: premium-fade-up .55s .05s cubic-bezier(.2,.75,.2,1) both;
+}
+
+.hero-section h1 {
+  animation: premium-fade-up .65s .1s cubic-bezier(.2,.75,.2,1) both;
+}
+
+.hero-description {
+  animation: premium-fade-up .65s .17s cubic-bezier(.2,.75,.2,1) both;
+}
+
+.prompt-card {
+  animation: premium-fade-up .7s .23s cubic-bezier(.2,.75,.2,1) both;
+}
+
+.prompt-card textarea {
+  transition: border-color .2s ease, box-shadow .25s ease, transform .2s ease;
+}
+
+.prompt-card textarea:focus {
+  transform: translateY(-1px);
+}
+
+.start-button {
+  animation: button-glow 3.2s ease-in-out infinite;
+  transition: transform .2s ease, box-shadow .25s ease, filter .2s ease;
+}
+
+.start-button:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.015);
+  filter: saturate(1.08);
+}
+
+.start-button:active:not(:disabled) {
+  transform: translateY(0) scale(.985);
+}
+
+.stage-item {
+  transition: color .2s ease, background .2s ease, border-color .2s ease, transform .2s ease;
+}
+
+.stage-item:hover {
+  transform: translateX(3px);
+}
+
+.stage-item.active {
+  animation: premium-fade-in .35s ease-out both;
+}
+
+.journey-card {
+  transition: transform .3s cubic-bezier(.2,.75,.2,1), box-shadow .3s ease, border-color .25s ease, background .3s ease;
+}
+
+.journey-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 18px 38px rgba(45,28,48,.08);
+}
+
+.journey-card:nth-child(1) { animation-delay: .04s; }
+.journey-card:nth-child(2) { animation-delay: .09s; }
+.journey-card:nth-child(3) { animation-delay: .14s; }
+.journey-card:nth-child(4) { animation-delay: .19s; }
+.journey-card:nth-child(5) { animation-delay: .24s; }
+
+.journey-icon {
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.journey-card:hover .journey-icon {
+  transform: scale(1.08) rotate(-3deg);
+  box-shadow: 0 8px 20px rgba(255,95,133,.10);
+}
+
+.ai-panel {
+  animation: premium-fade-up .55s ease-out both;
+}
+
+.progress-stage {
+  transition: color .2s ease, background .2s ease, transform .2s ease;
+}
+
+.progress-stage:hover {
+  transform: translateY(-1px);
+}
+
+.status-dot {
+  animation: soft-pulse 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
