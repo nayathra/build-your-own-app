@@ -3683,3 +3683,353 @@ body::after {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* =========================================================
+   TOPIC-AWARE GENERATED WEBSITE SURFACE
+   The prototype changes its content language and visual
+   modules based on the user's actual app idea.
+   ========================================================= */
+
+.preview-topic-showcase {
+  padding: 28px clamp(30px, 6vw, 88px);
+  display: grid;
+  grid-template-columns: 1.15fr .85fr;
+  gap: 14px;
+  border-bottom: 1px solid #eee8eb;
+  background: rgba(255,255,255,.72);
+}
+
+.topic-feature-visual {
+  position: relative;
+  min-height: 205px;
+  overflow: hidden;
+  padding: 30px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  color: #29222b;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.96), rgba(248,241,247,.9));
+  border: 1px solid #e6dfe4;
+  box-shadow: 0 18px 45px rgba(40,25,40,.06);
+}
+
+.topic-feature-visual > svg {
+  position: absolute;
+  top: 30px;
+  right: 34px;
+  z-index: 2;
+  opacity: .9;
+}
+
+.topic-visual-glow {
+  position: absolute;
+  width: 190px;
+  height: 190px;
+  right: -35px;
+  top: -55px;
+  border-radius: 50%;
+  background: rgba(255,95,133,.14);
+  filter: blur(10px);
+}
+
+.topic-feature-visual span {
+  position: relative;
+  z-index: 2;
+  color: #a06be9;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .16em;
+}
+
+.topic-feature-visual strong {
+  position: relative;
+  z-index: 2;
+  margin-top: 8px;
+  color: #252029;
+  font-size: 25px;
+  line-height: 1.05;
+}
+
+.topic-feature-visual small {
+  position: relative;
+  z-index: 2;
+  margin-top: 8px;
+  color: #7e747f;
+  font-size: 11px;
+}
+
+.topic-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+}
+
+.topic-metric {
+  min-height: 205px;
+  padding: 18px;
+  border: 1px solid #e7e1e5;
+  border-radius: 17px;
+  background: rgba(255,255,255,.88);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.topic-metric span {
+  margin-bottom: auto;
+  color: #b2a8b2;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.topic-metric strong {
+  color: #2c252e;
+  font-size: 28px;
+  letter-spacing: -.04em;
+}
+
+.topic-metric small {
+  margin-top: 5px;
+  color: #857b86;
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.hero-topic-icon {
+  position: absolute;
+  top: 70px;
+  right: 28px;
+  color: #d95b7a;
+  opacity: .9;
+}
+
+.hero-progress {
+  position: relative;
+  z-index: 3;
+  height: 5px;
+  margin-top: 18px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: #eee7eb;
+}
+
+.hero-progress span {
+  display: block;
+  width: 68%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ff5f85, #a86cff);
+}
+
+.preview-card-visual {
+  position: relative;
+  height: 92px;
+  overflow: hidden;
+  margin: -22px -22px 17px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  color: #d95878;
+  background:
+    linear-gradient(135deg, #fff1f5, #f4efff);
+  border-bottom: 1px solid #eee4e8;
+}
+
+.preview-card-visual > svg {
+  position: relative;
+  z-index: 2;
+}
+
+.preview-card-visual > span {
+  position: relative;
+  z-index: 2;
+  color: #b19da8;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.preview-card-visual-glow {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  right: -25px;
+  top: -75px;
+  border-radius: 50%;
+  background: rgba(170,108,255,.13);
+  filter: blur(8px);
+}
+
+.preview-card {
+  overflow: hidden;
+  padding-top: 0;
+}
+
+.preview-card-meta {
+  padding: 0 22px;
+}
+
+.preview-card h3,
+.preview-card p,
+.preview-card button {
+  margin-left: 22px;
+  margin-right: 22px;
+}
+
+.preview-card h3 {
+  margin-top: 7px;
+}
+
+.preview-card p {
+  margin-top: 9px;
+}
+
+.preview-card button {
+  margin-bottom: 22px;
+}
+
+.preview-footer span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Fitness visual language */
+.preview-category-fitness .topic-feature-visual {
+  background:
+    radial-gradient(circle at 85% 20%, rgba(255,102,137,.20), transparent 28%),
+    linear-gradient(145deg, #fff5f7, #f2edff);
+}
+
+.preview-category-fitness .topic-feature-visual > svg,
+.preview-category-fitness .preview-card-visual > svg {
+  color: #e34f73;
+}
+
+/* Books visual language */
+.preview-category-books .topic-feature-visual {
+  background:
+    linear-gradient(110deg, rgba(255,255,255,.95), rgba(244,239,255,.92)),
+    #fff;
+}
+
+.preview-category-books .topic-feature-visual > svg {
+  color: #7d60c8;
+}
+
+.preview-category-books .preview-card-visual {
+  background: linear-gradient(135deg, #f4f0ff, #fff6ef);
+}
+
+/* Food visual language */
+.preview-category-food .topic-feature-visual {
+  background:
+    radial-gradient(circle at 85% 18%, rgba(245,145,91,.20), transparent 28%),
+    linear-gradient(145deg, #fff8ed, #fff1f4);
+}
+
+.preview-category-food .topic-feature-visual > svg {
+  color: #dc704b;
+}
+
+.preview-category-food .preview-card-visual {
+  background: linear-gradient(135deg, #fff4e8, #fff1f2);
+}
+
+/* Travel visual language */
+.preview-category-travel .topic-feature-visual {
+  background:
+    radial-gradient(circle at 85% 20%, rgba(73,180,213,.20), transparent 30%),
+    linear-gradient(145deg, #effaff, #f1f1ff);
+}
+
+.preview-category-travel .topic-feature-visual > svg {
+  color: #398eb4;
+}
+
+.preview-category-travel .preview-card-visual {
+  background: linear-gradient(135deg, #edfaff, #f3efff);
+}
+
+/* Finance visual language */
+.preview-category-finance .topic-feature-visual {
+  background:
+    radial-gradient(circle at 85% 20%, rgba(73,170,124,.18), transparent 30%),
+    linear-gradient(145deg, #effbf5, #f3f2ff);
+}
+
+.preview-category-finance .topic-feature-visual > svg {
+  color: #398c6d;
+}
+
+.preview-category-finance .preview-card-visual {
+  background: linear-gradient(135deg, #effbf5, #f2f5ff);
+}
+
+/* Education visual language */
+.preview-category-education .topic-feature-visual {
+  background:
+    radial-gradient(circle at 85% 20%, rgba(130,104,214,.18), transparent 30%),
+    linear-gradient(145deg, #f5f1ff, #fff5fa);
+}
+
+.preview-category-education .topic-feature-visual > svg {
+  color: #7456bd;
+}
+
+.preview-category-education .preview-card-visual {
+  background: linear-gradient(135deg, #f4efff, #fff1f6);
+}
+
+/* Shopping visual language */
+.preview-category-shopping .topic-feature-visual {
+  background:
+    radial-gradient(circle at 85% 20%, rgba(238,153,82,.18), transparent 30%),
+    linear-gradient(145deg, #fff8ed, #f5f0ff);
+}
+
+.preview-category-shopping .topic-feature-visual > svg {
+  color: #c87546;
+}
+
+.preview-category-shopping .preview-card-visual {
+  background: linear-gradient(135deg, #fff6e9, #f5f0ff);
+}
+
+/* Music visual language */
+.preview-category-music .topic-feature-visual {
+  background:
+    radial-gradient(circle at 85% 20%, rgba(124,101,229,.22), transparent 30%),
+    linear-gradient(145deg, #f2efff, #fff1f7);
+}
+
+.preview-category-music .topic-feature-visual > svg {
+  color: #7659c6;
+}
+
+.preview-category-music .preview-card-visual {
+  background: linear-gradient(135deg, #f1edff, #fff1f7);
+}
+
+@media (max-width: 900px) {
+  .preview-topic-showcase {
+    grid-template-columns: 1fr;
+  }
+
+  .topic-feature-visual {
+    min-height: 180px;
+  }
+
+  .topic-metric {
+    min-height: 150px;
+  }
+}
+
+@media (max-width: 600px) {
+  .topic-metrics {
+    grid-template-columns: 1fr;
+  }
+}
