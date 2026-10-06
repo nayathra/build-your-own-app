@@ -487,7 +487,7 @@ function App() {
                         selectedTheme={selectedTheme}
                         onClose={() => setPreviewOpen(false)}
                       />
-                    )}}
+                    )}
 
                     {prototypeReady && (
                       <div className="continue-row">
